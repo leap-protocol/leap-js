@@ -4,7 +4,7 @@
   "description": "Legible Encoding for Addressable Packets",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "mocha --reporter nyan"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/leap-protocol/leap-js/issues"
   },
-  "homepage": "https://github.com/leap-protocol/leap-js#readme"
+  "homepage": "https://github.com/leap-protocol/leap-js#readme",
+  "devDependencies": {
+    "mocha": "^6.2.2"
+  }
 }
