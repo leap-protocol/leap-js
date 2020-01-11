@@ -110,7 +110,7 @@ exports.extract_types = function extract_types(root, path) {
     else if (protocolKey.DATA in start){
       for (let i in start[protocolKey.DATA]) {
         let item = start[protocolKey.DATA][i];
-        const name = Object.keys(item).pop()
+        const name = Object.keys(item).pop();
         types.push(
           ...extract_types(item[name], [])
         )
@@ -121,4 +121,58 @@ exports.extract_types = function extract_types(root, path) {
   return types
 }
 
+exports.extract_decendants = function extract_decendants(root, path) {
+  const decendants = [];
+  const start = exports.get_struct(root, path);
+  if (start != null) {
+    if (protocolKey.DATA in start) {
+      const data = start[protocolKey.DATA];
+
+      for (i in data) {
+        const item = data[i];
+        const name = Object.keys(item).pop();
+        const next_decendants = extract_decendants(item[name], []);
+
+        if (JSON.stringify(next_decendants) == JSON.stringify([""])) {
+          decendants.push(name);
+        }
+        else {
+          for (i in next_decendants) {
+            decendants.push(name + "/" + next_decendants[i]);
+          }
+        }
+      }
+    }
+    else {
+      return [""];
+    }
+  }
+  return decendants;
+}
+
+exports.extract_branches = function extract_branches(root, path) {
+  const start = exports.get_struct(root, path);
+  const branches = [];
+  if (start != null) {
+    if (protocolKey.DATA in start) {
+      const data = start[protocolKey.DATA];
+      for (i in data) {
+        const item = data[i];
+        const name = Object.keys(item).pop();
+        branches.push(name);
+        const next_branches = extract_branches(item[name], [])
+        if (JSON.stringify(next_branches) != JSON.stringify([""])) {
+          for (i in next_branches) {
+            const branch = next_branches[i];
+            branches.push(name + "/" + branch);
+          }
+        }
+      }
+    }
+    else {
+      return [""];
+    }
+  }
+  return branches;
+}
 
