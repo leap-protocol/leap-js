@@ -1,5 +1,6 @@
 const assert = require('assert');
 const explore = require('../src/explore.js');
+const fs = require('fs');
 
 CONFIG_PATH = "test/fake/protocol.json";
 
@@ -45,5 +46,31 @@ describe('Get Struct', function() {
   });
 });
 
-
+describe('Extract Types', function() {
+  beforeEach(function() {
+    this.root = JSON.parse(
+      fs.readFileSync(CONFIG_PATH)
+    );
+  });
+  it('Simple type', function() {
+    const expected = ["bool"];
+    const result = explore.extract_types(this.root, ["ping"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
+  });
+  it('Nested type', function() {
+    const expected = ["u16"];
+    const result = explore.extract_types(this.root, ["protocol", "version", "patch"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
+  });
+  it('Multiple types', function() {
+    const expected = ["u8", "u8", "u16"];
+    const result = explore.extract_types(this.root, ["protocol", "version"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
+  });
+  it('Multiple types nested', function() {
+    const expected = ["u8", "u8", "u16", "string"];
+    const result = explore.extract_types(this.root, ["protocol"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
+  });
+});
 

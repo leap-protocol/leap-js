@@ -2,7 +2,6 @@ const protocolKey = require('./protocolKey.js');
 
 
 exports.get_struct = function get_struct(root, path) {
-
   if (path.length === 0) {
     return root;
   }
@@ -13,7 +12,6 @@ exports.get_struct = function get_struct(root, path) {
   else {
     return null;
   }
-
 
   for (let i in data) {
     let item = data[i];
@@ -30,3 +28,26 @@ exports.get_struct = function get_struct(root, path) {
 
   return null;
 }
+
+exports.extract_types = function extract_types(root, path) {
+  const start = exports.get_struct(root, path);
+  const types = [];
+  if (start != null) {
+    if (protocolKey.TYPE in start) {
+      types.push(start[protocolKey.TYPE]);
+    }
+    else if (protocolKey.DATA in start){
+      for (let i in start[protocolKey.DATA]) {
+        let item = start[protocolKey.DATA][i];
+        const name = Object.keys(item).pop()
+        types.push(
+          ...extract_types(item[name], [])
+        )
+      }
+    }
+  }
+
+  return types
+}
+
+
