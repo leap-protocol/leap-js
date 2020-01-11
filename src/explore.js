@@ -1,6 +1,77 @@
 const protocolKey = require('./protocolKey.js');
 
 
+exports.count_depth = function count_depth(root) {
+  let count = 0
+
+  if (protocolKey.DATA in root) {
+    const data = root[protocolKey.DATA]
+    for (i in data) {
+      const item = data[i]
+      count += 1
+      const name = Object.keys(item).pop();
+      if (protocolKey.DATA in item[name]) {
+        count += count_depth(item[name])
+      }
+    }
+  }
+  return count;
+}
+
+
+exports.count_to_path = function count_to_path(root, path) {
+  let data;
+  if ((protocolKey.DATA in root) == false) {
+    return null;
+  }
+  else {
+    data = root[protocolKey.DATA];
+  }
+
+  let count = 0;
+  if (path == null) {
+    return exports.count_depth(root)
+  }
+  const search = path[0];
+  let found_path = false;
+
+  for (i in data) {
+    const item = data[i];
+    // Expect only one key value pair per data item
+    const name = Object.keys(item).pop();
+    count += 1;
+    if (name != search) {
+      if (protocolKey.TYPE in item[name]) {
+        continue;
+      }
+      else {
+        count += exports.count_depth(item[name]);
+      }
+    }
+    else {
+      if (path.length > 1) {
+        const deeper = path.slice(1, path.length);
+        const incr = count_to_path(item[search], deeper);
+        if (incr != null) {
+          count += incr;
+        }
+        else {
+          return null;
+        }
+      }
+      found_path = true;
+      break;
+    }
+  }
+  if (found_path == false) {
+    // search item was not found
+    return null;
+  }
+
+  return count;
+}
+
+
 exports.get_struct = function get_struct(root, path) {
   if (path.length === 0) {
     return root;
