@@ -24,5 +24,8 @@
   "homepage": "https://github.com/leap-protocol/leap-js#readme",
   "devDependencies": {
     "mocha": "^6.2.2"
+  },
+  "dependencies": {
+    "toml": "^3.0.0"
   }
 }
