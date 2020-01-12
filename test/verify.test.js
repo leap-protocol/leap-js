@@ -1,4 +1,6 @@
+const assert = require('assert');
 const toml = require('toml');
+const fs= require('fs');
 const verify = require('../src/verify');
 
 function open_json(filepath) {
@@ -11,11 +13,11 @@ function open_toml(filepath) {
 
 describe('VerifyBasic', function() {
   beforeEach(function() {
-    this.verifier = verify.Verifier();
-    this.valid_json = "./fake/protocol.json";
-    this.valid_small_json = "./fake/protocol-small.json";
-    this.valid_toml = "./fake/protocol.toml";
-    this.valid_small_toml = "./fake/protocol-small.toml";
+    this.verifier = new verify.Verifier();
+    this.valid_json = "test/fake/protocol.json";
+    this.valid_small_json = "test/fake/protocol-small.json";
+    this.valid_toml = "test/fake/protocol.toml";
+    this.valid_small_toml = "test/fake/protocol-small.toml";
   });
   it('valid json', function() {
     const config = open_json(this.valid_json);
@@ -41,12 +43,12 @@ describe('VerifyBasic', function() {
 
 describe('VerifyData', function() {
   beforeEach(function() {
-    this.verifier = verify.Verifier();
-    this.valid = "./fake/protocol.json";
+    this.verifier = new verify.Verifier();
+    this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
   it('no_data', function() {
-    this.config.pop('data', None);
+    delete this.config.data;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('incorrect_data_type', function() {
@@ -146,8 +148,8 @@ describe('VerifyData', function() {
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('addr_exceeds_limit', function() {
-    this.config['data'].append({ 'new' : { "addr": "FFFF", "type": "u8" }});
-    this.config['data'].append({ 'overflow' : { "type": "u8" }});
+    this.config['data'].push({ 'new' : { "addr": "FFFF", "type": "u8" }});
+    this.config['data'].push({ 'overflow' : { "type": "u8" }});
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_buried_deep', function() {
@@ -158,24 +160,24 @@ describe('VerifyData', function() {
 
 describe('VerifySymbols', function() {
   beforeEach(function() {
-    this.verifier = verify.Verifier();
-    this.valid = "./fake/protocol.json";
+    this.verifier = new verify.Verifier();
+    this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
   it('no_separator', function() {
-    this.config.pop('separator', None);
+    delete this.config.separator;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('no_compound', function() {
-    this.config.pop('compound', None);
+    delete this.config.compound;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('no_end', function() {
-    this.config.pop('end', None);
+    delete this.config.end;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_separator_type', function() {
-    this.config['separator'] = dict();
+    this.config['separator'] = {};
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_compound_type', function() {
@@ -226,16 +228,16 @@ describe('VerifySymbols', function() {
 
 describe('VerifyCategory', function() {
   beforeEach(function() {
-    this.verifier = verify.Verifier();
-    this.valid = "./fake/protocol.json";
+    this.verifier = new verify.Verifier();
+    this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
   it('no_category', function() {
-    this.config.pop('category', None);
+    delete this.config.category;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_category_length', function() {
-    this.config['category'] = dict();
+    this.config['category'] = {};
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_category_key', function() {
@@ -255,7 +257,7 @@ describe('VerifyCategory', function() {
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_category_value_type', function() {
-    this.config['category']["tes"] = True
+    this.config['category']["tes"] = true
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_category_value_length', function() {
@@ -279,24 +281,24 @@ describe('VerifyCategory', function() {
 
 describe('VerifyVersion', function() {
   beforeEach(function() {
-    this.verifier = verify.Verifier();
-    this.valid = "./fake/protocol.json";
+    this.verifier = new verify.Verifier();
+    this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
   it('no_version', function() {
-    this.config.pop('version', None);
+    delete this.config.version;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('no_major_version', function() {
-    this.config['version'].pop('major', None);
+    delete this.config.version.major;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('no_minor_version', function() {
-    this.config['version'].pop('minor', None);
+    delete this.config.version.minor;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('no_patch_version', function() {
-    this.config['version'].pop('patch', None);
+    delete this.config.version.patch;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('too_many_version_items', function() {
@@ -312,7 +314,7 @@ describe('VerifyVersion', function() {
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('invalid_patch_version', function() {
-    this.config['version']['patch'] = None
+    this.config['version']['patch'] = null
     assert.equal(this.verifier.verify(this.config), false);
   });
 });
