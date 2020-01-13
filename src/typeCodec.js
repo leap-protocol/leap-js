@@ -103,7 +103,9 @@ exports.encode_types = function encode_types(item, type) {
 //   }
 // }
 
-// exports.decode_types = function decode_types(item, type) {
+exports.decode_types = function decode_types(item, type) {
+  return "";
+}
 //   if (type == "u8") {
 //     return decode_unsigned(item, 8);
 //   }

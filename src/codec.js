@@ -13,6 +13,7 @@ exports.Codec = class Codec {
     this.valid = false;
     this.encode_map = {};
     this.decode_map = {};
+    this.start_to_category_map = {};
 
     try {
       data = fs.readFileSync(filepath);
@@ -27,6 +28,7 @@ exports.Codec = class Codec {
     if (this.valid) {
       this._config = JSON.parse(data);
       this._generate_maps(this._config);
+      this._map_categories();
     }
   }
 
@@ -86,6 +88,75 @@ exports.Codec = class Codec {
     }
     encoded += this._config["end"];
     return utf8.encode(encoded);
+  }
+
+
+  decode(encoded) {
+    if (this._is_valid == false) {
+      return [encoded, []];
+    }
+
+    let strings = encoded.split(
+      utf8.encode(this._config["end"])
+    );
+    const remainder = strings[-1];
+    const packets = [];
+
+    if (strings.length == 1) {
+      return [remainder, []];
+    }
+
+    strings = strings.slice(0, strings.length - 1);
+
+    for(let i in strings) {
+      let string = strings[i];
+      string = utf8.decode(string);
+      const start = string[0];
+      const category = this._category_from_start(start);
+      const _packet = new packet.Packet(category);
+
+      string = string.slice(1, string.length);
+      const subpackets = string.split(this._config["compound"]);
+
+      for (let j in subpackets) {
+        const subpacket = subpackets[j];
+        const parts = subpacket.split(this._config["separator"]);
+
+        if (parts != ['']) {
+          const payload = [];
+          const addr = parts[0];
+          const decode_data = this.decode_map[addr];
+
+          for (let k = 0; k < decode_data.types.length; k++) {
+            const item = parts[k + 1];
+            const type = decode_data.types[k];
+            payload.push(typeCodec.decode_types(item, type));
+          }
+
+          _packet.add(decode_data.path, payload);
+        }
+      }
+
+      packets.push(_packet);
+    }
+
+    return [remainder, packets];
+  }
+
+  _map_categories() {
+    const categories = this._config['category'];
+    const keys = Object.keys(categories);
+
+    for (i in keys) {
+      const key = keys[i];
+      const start = categories[key];
+
+      this.start_to_category_map[start] = key;
+    }
+  }
+
+  _category_from_start(start) {
+    return this.start_to_category_map[start];
   }
 
   _generate_maps(protocol_root) {
