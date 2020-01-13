@@ -1,5 +1,8 @@
 const fs = require('fs');
+const utf8 = require('utf8');
+const packet = require('./packet');
 const explore = require('./explore');
+const typeCodec = require('./typeCodec');
 const protocolKey = require('./protocolKey');
 const itemData = require('./itemData');
 
@@ -22,10 +25,67 @@ exports.Codec = class Codec {
 
 
     if (this.valid) {
-      const protocol = JSON.parse(data);
-      // console.log(filepath, protocol);
-      this._generate_maps(protocol);
+      this._config = JSON.parse(data);
+      this._generate_maps(this._config);
     }
+  }
+
+  encode(packets){
+    if (this._is_valid == false) {
+      return utf8.encode("");
+    }
+    if ((packets instanceof packet.Packet) == true) {
+      packets = [packets];
+    }
+    else if (typeof packets != "object") {
+      return utf8.encode("");
+    }
+
+    let encoded = "";
+
+    for (let i in packets) {
+      const _packet = packets[i];
+      let internal = "";
+
+      if (encoded != "") {
+        encoded += this._config["end"];
+      }
+      encoded += this._config["category"][_packet.category]
+
+      for (let j in _packet.paths) {
+        const path = _packet.paths[j];
+        const payload = _packet.payloads[j];
+
+        if (path != null) {
+          let encode_data;
+          // Detect compound packet and add compound character
+          if (internal != "") {
+            internal += this._config["compound"];
+          }
+
+          if (path in this.encode_map) {
+            encode_data = this.encode_map[path];
+          }
+          else {
+            console.log(`Cound not encode with invalid branch: ${path}`);
+            return utf8.encode("");
+          }
+
+          internal += encode_data.addr;
+
+          if (payload != null) {
+            const count = Math.min(encode_data.types.length, payload.length);
+            for (let i = 0; i < count; i++) {
+              internal += this._config["separator"];
+              internal += typeCodec.encode_types(payload[i], encode_data.types[i]);
+            }
+          }
+        }
+      }
+      encoded += internal
+    }
+    encoded += this._config["end"];
+    return utf8.encode(encoded);
   }
 
   _generate_maps(protocol_root) {
@@ -55,7 +115,7 @@ exports.Codec = class Codec {
         addr_path.push("");
       }
 
-      // Handle address generation. 
+      // Handle address generation.
       // If the branch defines no address it is incremented
       // If it does have an address, we use the nested addressing rules
       // See leap-protocol.github.io for more details
@@ -67,7 +127,7 @@ exports.Codec = class Codec {
         else {
           // Nested address specifications add to specified addresses further up
           // the chain.
-          const int_addr = this._to_addr_int(addr_path[depth-1]) + 
+          const int_addr = this._to_addr_int(addr_path[depth-1]) +
             this._to_addr_int(root[protocolKey.ADDR]);
           addr_path[depth] = this._to_addr_string(int_addr);
         }
@@ -84,7 +144,7 @@ exports.Codec = class Codec {
           );
         }
       }
-      
+
       // Configure address depths for the next branch
       prev_depth = depth;
       max_depth = Math.max(max_depth, depth);
