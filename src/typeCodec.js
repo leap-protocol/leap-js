@@ -16,7 +16,10 @@ exports.encode_types = function encode_types(item, type) {
     return to_padded_hex_string(value, 8);
   }
   else if (type == "u64") {
-    value = clamp(item, 0x0000000000000000, 0xffffffffffffffff);
+    if ((item instanceof BigInt) == false) {
+      item = BigInt(item);
+    }
+    value = clamp(item, 0x0000000000000000n, 0xffffffffffffffffn);
     return to_padded_hex_string(value, 16);
   }
   else if (type == "i8") {
@@ -35,8 +38,11 @@ exports.encode_types = function encode_types(item, type) {
     return to_padded_hex_string(value, 8);
   }
   else if (type == "i64") {
-    value = clamp(item, -0x8000000000000000, 0x7FFFFFFFFFFFFFFF);
-    value = (value < 0) ? (value + 0x10000000000000000): (value);
+    if ((item instanceof BigInt) == false) {
+      item = BigInt(item);
+    }
+    value = clamp(item, -0x8000000000000000n, 0x7FFFFFFFFFFFFFFFn);
+    value = (value < 0) ? (value + 0x10000000000000000n): (value);
     return to_padded_hex_string(value, 16);
   }
   else if (type == "string") {
@@ -54,14 +60,21 @@ exports.encode_types = function encode_types(item, type) {
   else if (type == "double") {
     const view = new DataView(new ArrayBuffer(8));
     view.setFloat64(0, item);
-    value = view.getInt64(0);
-    return to_padded_hex_string(value, 16);
+    value = view.getInt32(0);
+    let str1 = to_padded_hex_string(value, 8);
+    value = view.getInt32(4);
+    return str1 + to_padded_hex_string(value, 8);
   }
   else if (typeof type == "object") {
-    // if (item in type) {
-    //   x = type.index(item);
-    //   return "{:02x}".format(clamp(x, 0x00, 0xff));
-    // }
+    if (type.includes(item)) {
+      value = type.indexOf(item);
+      if (value != undefined) {
+        return to_padded_hex_string(value, 2);
+      }
+    }
+    return "";
+  }
+  else {
     return "";
   }
 }
@@ -138,7 +151,13 @@ exports.encode_types = function encode_types(item, type) {
 //   }
 
 function clamp(value, min_value, max_value) {
-  return Math.max(min_value, Math.min(value, max_value));
+  if (value > max_value) {
+    return max_value;
+  }
+  if (value < min_value) {
+    return min_value;
+  }
+  return value;
 }
 
 function to_padded_hex_string(ivalue, zeropads) {

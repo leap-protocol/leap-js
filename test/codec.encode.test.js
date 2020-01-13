@@ -204,21 +204,21 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  // it('simple_u64', function() {
-  //   expected = utf8.encode("S2006:0010223400000078\n");
-  //   _packet = new packet.Packet("set", "typecheck/uint64", [0x10223400000078]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('underflow_u64', function() {
-  //   expected = utf8.encode("S2006:0000000000000000\n");
-  //   _packet = new packet.Packet("set", "typecheck/uint64", [-0x10223400000078]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
+  it('simple_u64', function() {
+    expected = utf8.encode("S2006:0010223400000078\n");
+    _packet = new packet.Packet("set", "typecheck/uint64", [0x10223400000078n]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('underflow_u64', function() {
+    expected = utf8.encode("S2006:0000000000000000\n");
+    _packet = new packet.Packet("set", "typecheck/uint64", [-0x10223400000078n]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
   it('overflow_u64', function() {
     expected = utf8.encode("S2006:ffffffffffffffff\n");
-    _packet = new packet.Packet("set", "typecheck/uint64", [0x10000010223400000078]);
+    _packet = new packet.Packet("set", "typecheck/uint64", [0x10000010223400000078n]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -294,59 +294,59 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  // it('simple_i64', function() {
-  //   expected = utf8.encode("S200a:0010223400000078\n");
-  //   _packet = new packet.Packet("set", "typecheck/int64", [0x10223400000078]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('signed_i64', function() {
-  //   expected = utf8.encode("S200a:ffefddcbffffff88\n");
-  //   _packet = new packet.Packet("set", "typecheck/int64", [-0x10223400000078]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('overflow_i64', function() {
-  //   expected = utf8.encode("S200a:7fffffffffffffff\n");
-  //   _packet = new packet.Packet("set", "typecheck/int64", [0x1ffffffffffffffff0]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('underflow_i64', function() {
-  //   expected = utf8.encode("S200a:8000000000000000\n");
-  //   _packet = new packet.Packet("set", "typecheck/int64", [-0x1FF000000000000000]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('float', function() {
-  //   expected = utf8.encode("S200b:60dc9cc9\n");
-  //   _packet = new packet.Packet("set", "typecheck/float", [1.2717441261e+20]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('double', function() {
-  //   expected = utf8.encode("S200c:3ff3c083126e978d\n");
-  //   _packet = new packet.Packet("set", "typecheck/double", [1.2344999999999999307]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('enum', function() {
-  //   expected = utf8.encode("S200d:02\n");
-  //   _packet = new packet.Packet("set", "typecheck/enum", ["item_3"]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('enum_invalid', function() {
-  //   expected = utf8.encode("S200d:\n");
-  //   _packet = new packet.Packet("set", "typecheck/enum", ["invalid"]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
-  // it('enum_none', function() {
-  //   expected = utf8.encode("S200e:\n");
-  //   _packet = new packet.Packet("set", "typecheck/none", ["unneccesary"]);
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
+  it('simple_i64', function() {
+    expected = utf8.encode("S200a:0010223400000078\n");
+    _packet = new packet.Packet("set", "typecheck/int64", [0x10223400000078n]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('signed_i64', function() {
+    expected = utf8.encode("S200a:ffefddcbffffff88\n");
+    _packet = new packet.Packet("set", "typecheck/int64", [-0x10223400000078n]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('overflow_i64', function() {
+    expected = utf8.encode("S200a:7fffffffffffffff\n");
+    _packet = new packet.Packet("set", "typecheck/int64", [0x1ffffffffffffffff0n]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('underflow_i64', function() {
+    expected = utf8.encode("S200a:8000000000000000\n");
+    _packet = new packet.Packet("set", "typecheck/int64", [-0x1FF000000000000000n]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('float', function() {
+    expected = utf8.encode("S200b:60dc9cc9\n");
+    _packet = new packet.Packet("set", "typecheck/float", [1.2717441261e+20]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('double', function() {
+    expected = utf8.encode("S200c:3ff3c083126e978d\n");
+    _packet = new packet.Packet("set", "typecheck/double", [1.2344999999999999307]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('enum', function() {
+    expected = utf8.encode("S200d:02\n");
+    _packet = new packet.Packet("set", "typecheck/enum", ["item_3"]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('enum_invalid', function() {
+    expected = utf8.encode("S200d:\n");
+    _packet = new packet.Packet("set", "typecheck/enum", ["invalid"]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('enum_none', function() {
+    expected = utf8.encode("S200e:\n");
+    _packet = new packet.Packet("set", "typecheck/none", ["unneccesary"]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
 });
 
