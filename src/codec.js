@@ -69,7 +69,7 @@ exports.Codec = class Codec {
             encode_data = this.encode_map[path];
           }
           else {
-            console.log(`Cound not encode with invalid branch: ${path}`);
+            console.log(`Could not encode with invalid branch: ${path}`);
             return utf8.encode("");
           }
 
@@ -99,7 +99,7 @@ exports.Codec = class Codec {
     let strings = encoded.split(
       utf8.encode(this._config["end"])
     );
-    const remainder = strings[-1];
+    const remainder = strings.slice(strings.length-1, strings.length);
     const packets = [];
 
     if (strings.length == 1) {
@@ -126,9 +126,10 @@ exports.Codec = class Codec {
           const payload = [];
           const addr = parts[0];
           const decode_data = this.decode_map[addr];
+          const encoded_payload = parts.slice(1, parts.length);
 
-          for (let k = 0; k < decode_data.types.length; k++) {
-            const item = parts[k + 1];
+          for (let k = 0; k < encoded_payload.length; k++) {
+            const item = encoded_payload[k];
             const type = decode_data.types[k];
             payload.push(typeCodec.decode_types(item, type));
           }
