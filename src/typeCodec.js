@@ -130,22 +130,22 @@ exports.decode_types = function decode_types(item, type) {
     return decode_unsigned(item, 16n);
   }
   else if (type == "u32") {
-    return decode_unsigned(item, 32);
+    return decode_unsigned(item, 32n);
   }
   else if (type == "u64") {
-    return decode_unsigned(item, 64);
+    return decode_unsigned(item, 64n);
   }
   else if (type == "i8") {
-    return decode_signed(item, 8);
+    return decode_signed(item, 8n);
   }
   else if (type == "i16") {
-    return decode_signed(item, 16);
+    return decode_signed(item, 16n);
   }
   else if (type == "i32") {
-    return decode_signed(item, 32);
+    return decode_signed(item, 32n);
   }
   else if (type == "i64") {
-    return decode_signed(item,64);
+    return decode_signed(item, 64n);
   }
   else if (type == "string") {
     return item;
@@ -153,14 +153,19 @@ exports.decode_types = function decode_types(item, type) {
   else if (type == "bool") {
     return (item == "1") ? (true) : (false);
   }
-  // else if (type == "float") {
-  //   [value] = struct.unpack('>f', bytearray.fromhex(item));
-  //   return x;
-  // }
-  // else if (type == "double") {
-  //   [value] = struct.unpack('>d', bytearray.fromhex(item));
-  //   return x;
-  // }
+  else if (type == "float") {
+    const view = new DataView(new ArrayBuffer(4));
+    view.setInt32(0, Number(BigInt("0x"+item)));
+    value = view.getFloat32(0);
+    return value;
+  }
+  else if (type == "double") {
+    const view = new DataView(new ArrayBuffer(8));
+    view.setInt32(0, Number(BigInt("0x"+item.slice(0, 8))));
+    view.setInt32(4, Number(BigInt("0x"+item.slice(8, 16))));
+    value = view.getFloat64(0);
+    return value;
+  }
   else if (typeof type == "object") {
     value = decode_unsigned(item, 8n);
     if (value < type.length) {
@@ -184,7 +189,4 @@ function to_padded_hex_string(ivalue, zeropads) {
   return ("0".repeat(zeropads) + ivalue.toString(16)).substr(-zeropads);
 }
 
-function to_addr_int(svalue) {
-  return parseInt(svalue, 16);
-}
 
