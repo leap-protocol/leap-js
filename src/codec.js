@@ -144,6 +144,27 @@ exports.Codec = class Codec {
     return [remainder, packets];
   }
 
+  unpack(_packet) {
+    const result = {};
+    for (let i = 0; i < _packet.paths.length; i++) {
+      const path = _packet.paths[i];
+      const payload = _packet.payloads[i];
+      const unpack_data = this.encode_map[path];
+
+      const value_count = Math.min(
+        payload.length,
+        unpack_data.data_branches.length
+        );
+
+      for (let j = 0; j < value_count; j++) {
+        const branch = unpack_data.data_branches[j];
+        const value = payload[j];
+        result[branch] = value;
+      }
+    }
+    return result;
+  }
+
   _map_categories() {
     const categories = this._config['category'];
     const keys = Object.keys(categories);

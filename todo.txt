@@ -1,6 +1,5 @@
 [] Encode strings to bytes
-[] Add test for decoding incorrect strings goes to null
-[] Unpack
+[X] Unpack
 [] Packet testing
   [] Codec fake
 [] Codec validity testing
