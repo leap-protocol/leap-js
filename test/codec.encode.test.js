@@ -115,7 +115,7 @@ describe('SetPacketEncodeMultiple', function() {
     assert.equal(result, expected);
   });
   it('non_sequential', function() {
-    expected = utf8.encode("S0000:12:34:0567:Hoani\n");
+    expected = utf8.encode("S0000:12:34:0567:486f616e69\n");
     _packet = new packet.Packet("set", "protocol", [0x12, 0x34, 0x567, "Hoani"]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
@@ -139,7 +139,7 @@ describe('SetPacketEncodeSingle', function() {
     this.codec = new codec.Codec("test/fake/protocol.json");
   });
   it('simple_string', function() {
-    expected = utf8.encode("S2001:Hoani's String\n");
+    expected = utf8.encode("S2001:486f616e69277320537472696e67\n");
     _packet = new packet.Packet("set", "typecheck/string", ["Hoani's String"]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);

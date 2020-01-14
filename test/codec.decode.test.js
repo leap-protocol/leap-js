@@ -117,7 +117,7 @@ describe('SetPayloadDecodeMultiple', function() {
   });
   it('non_sequential', function() {
     expected = new packet.Packet("set", "protocol", [0x12, 0x34, 0x567, "Hoani"]);
-    [_, [result]] = this.codec.decode(("S0000:12:34:0567:Hoani\n"));
+    [_, [result]] = this.codec.decode(("S0000:12:34:0567:486f616e69\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
@@ -145,7 +145,7 @@ describe('SetPayloadDecodeSingle', function() {
   });
   it('simple_string', function() {
     expected = new packet.Packet("set", "typecheck/string", ["Hoani's String"]);
-    [_, [result]] = this.codec.decode(("S2001:Hoani's String\n"));
+    [_, [result]] = this.codec.decode(("S2001:486f616e69277320537472696e67\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());

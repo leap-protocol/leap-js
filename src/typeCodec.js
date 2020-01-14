@@ -65,7 +65,11 @@ exports.encode_types = function encode_types(item, type) {
       return to_padded_hex_string(value, 16);
     }
     else if (type == "string") {
-      return item;
+      value = "";
+      for (let i in item) {
+        value += item.charCodeAt(i).toString(16);
+      }
+      return value;
     }
     else if (type == "bool") {
       return (item == true) ? ("1") : ("0");
@@ -158,7 +162,12 @@ exports.decode_types = function decode_types(item, type) {
       return decode_signed(item, 64n);
     }
     else if (type == "string") {
-      return item;
+      value = "";
+      for (let i = 0; i< item.length; i+=2) {
+        const char_code = Number("0x" + item.slice(i, i+2));
+        value += String.fromCharCode(char_code);
+      }
+      return value;
     }
     else if (type == "bool") {
       return (item == "1") ? (true) : (false);
