@@ -46,7 +46,6 @@ function do_verify(filepath, print){
       console.log(`Verification of ${filepath} failed`);
       console.log("Invalid JSON/TOML");
     }
-    config_file.close();
     return false;
   }
 

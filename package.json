@@ -3,6 +3,7 @@
   "version": "1.0.2",
   "description": "Legible Encoding for Addressable Packets",
   "main": "index.js",
+  "bin": "cli.js",
   "scripts": {
     "test": "mocha --reporter nyan"
   },
