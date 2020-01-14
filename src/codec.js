@@ -1,35 +1,58 @@
 const fs = require('fs');
 const utf8 = require('utf8');
+const toml = require('toml');
 const packet = require('./packet');
 const explore = require('./explore');
 const typeCodec = require('./typeCodec');
 const protocolKey = require('./protocolKey');
 const itemData = require('./itemData');
+const verify = require('./verify');
 
 
 exports.Codec = class Codec {
   constructor(filepath) {
     let data;
-    this.valid = false;
+    this.is_valid = false;
     this.encode_map = {};
     this.decode_map = {};
     this.start_to_category_map = {};
 
     try {
       data = fs.readFileSync(filepath);
-      this.valid = true;
+      this.is_valid = true;
     }
     catch (err) {
-      this.valid = false;
+      this.is_valid = false;
       console.log("invlaid file");
     }
 
-
-    if (this.valid) {
-      this._config = JSON.parse(data);
-      this._generate_maps(this._config);
-      this._map_categories();
+    if (this.is_valid) {
+      try {
+        this._config = JSON.parse(data);
+      }
+      catch {
+        try {
+          this._config = toml.parse(data);
+        }
+        catch {
+          this.is_valid = false;
+        }
+      }
     }
+
+    if (this.is_valid) {
+      if (verify.verify_quiet(filepath)) {
+        this._generate_maps(this._config);
+        this._map_categories();
+      }
+      else {
+        this.is_valid = false;
+      }
+    }
+  }
+
+  valid() {
+    return this.is_valid;
   }
 
   encode(packets){

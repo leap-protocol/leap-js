@@ -4,46 +4,67 @@ const toml = require('toml');
 const fs = require('fs');
 const protocolKey = require('./protocolKey.js');
 
-function verify(config_file_path){
-  const file_data = fs.readFileSync(filepath);
+exports.verify = function verify(filepath){
+  return do_verify(filepath, true);
+}
+
+exports.verify_quiet = function verify_quiet(filepath){
+  return do_verify(filepath, false);
+}
+
+function do_verify(filepath, print){
+  const data = fs.readFileSync(filepath);
   if (data.length == 0) {
-    console.log(`File ${config_file_path} cannot be opened, maybe it doesn't exist?`);
+    if (print) {
+      console.log(`File ${filepath} cannot be opened, maybe it doesn't exist?`);
+    }
     return false;
   }
 
+  let config;
   let invalid = false;
-
-  let config = JSON.parse(file_data);
-
+  try {
+    config = JSON.parse(data);
+  }
+  catch {
+    config = "";
+  }
   if (config.length == 0) {
-    config = toml.parse(file_data);
-    
+    try {
+      config = toml.parse(data);
+    }
+    catch {
+      config = "";
+    }
     if (config.length == 0) {
       invalid = true;
     }
   }
 
-
   if (invalid) {
-    console.log("Verification of {} failed".format(config_file_path));
-    console.log("Invalid JSON/TOML");
+    if (print) {
+      console.log(`Verification of ${filepath} failed`);
+      console.log("Invalid JSON/TOML");
+    }
     config_file.close();
     return false;
   }
 
-  config_file.close();
-
-  v = Verifier();
+  v = new exports.Verifier();
 
   result = v.verify(config);
   if (result == false) {
-    console.log("Verification of {} failed".format(config_file_path))
-    v.print_failure()
-    console.log(config)
+    if (print) {
+      console.log(`Verification of ${filepath} failed`);
+      v.print_failure();
+      console.log(config);
+    }
     return false;
   }
   else {
-    console.log("Verification of {} passed".format(config_file_path))
+    if (print) {
+      console.log(`Verification of ${filepath} passed`);
+    }
     return true;
   }
 }
@@ -173,7 +194,7 @@ exports.Verifier = class Verifier {
       return false;
     }
 
-    for (i in data) {
+    for (let i in data) {
       const item = data[i];
 
       if (this.verify_item(item, branch) == false) {
@@ -191,13 +212,13 @@ exports.Verifier = class Verifier {
     }
 
     const keys = Object.keys(item);
-    
+
     if (keys.length != 1) {
       this.failure = `data items in ${branch} must have only one key-pair per object`;
       return false;
     }
 
-    for (i in keys) {
+    for (let i in keys) {
       const key = keys[i];
       if (/^[A-Za-z]/.exec(key) == null)  {
         this.failure = `data item key "${key}" in "${branch}" invalid. Keys must be strings containing only alpha numeric, dash(-) and underscore(_) characters`;
@@ -300,7 +321,7 @@ exports.Verifier = class Verifier {
     }
 
     if (typeof type === "object") {
-      for (i in type) {
+      for (let i in type) {
         const item = type[i];
         if ((typeof item !== "string") || /^[A-Za-z0-9\-_]+$/.exec(item) === null) {
           this.failure = `items "${item}" in ${protocolKey.TYPE} enum of "${branch}" may only be strings using alpha-numeric characters, dashes (-) and underscores (_)`;
@@ -315,7 +336,7 @@ exports.Verifier = class Verifier {
   verify_symbols(config) {
     const symbols = ["separator", "compound", "end"];
 
-    for (i in symbols) {
+    for (let i in symbols) {
       const symbol = symbols[i];
       if ((symbol in config) == false) {
         this.failure = `Missing ${symbol} key in root data structure`;
@@ -359,7 +380,7 @@ exports.Verifier = class Verifier {
       return false;
     }
 
-    for (i in keys) {
+    for (let i in keys) {
       const key = keys[i];
       if (/^[A-Za-z]/.exec(key) == null) {
         this.failure = "Category keys must be strings";
@@ -372,8 +393,8 @@ exports.Verifier = class Verifier {
       }
     }
 
-    
-    for (i in values) {
+
+    for (let i in values) {
       const value = values[i];
       if ((typeof value === "string") == false) {
         this.failure = 'A category must be assigned to a single capital letter e.g. "C"';
@@ -400,7 +421,7 @@ exports.Verifier = class Verifier {
     const keys = Object.keys(version);
     const segments = ["major", "minor", "patch"];
 
-    for (i in segments) {
+    for (let i in segments) {
       const segment = segments[i];
       if ((segment in version) == false) {
         this.failure = `Missing "${segment}" in "version" data structure`;
