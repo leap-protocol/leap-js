@@ -304,12 +304,26 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert(Math.abs(result.payloads[0][0] - expected.payloads[0][0]) < 0.00001e+20);
   });
+  it('float invalid', function() {
+    expected = new packet.Packet("set", "typecheck/float", [null]);
+    [_, [result]] = this.codec.decode(("S200b:60gc9cc9\n"));
+    assert.equal(result.category, expected.category);
+    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
+    assert.equal((result.payloads).toString(), (expected.payloads).toString());
+  });
   it('double', function() {
     expected = new packet.Packet("set", "typecheck/double", [1.2344999999999999307]);
     [_, [result]] = this.codec.decode(("S200c:3ff3c083126e978d\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert(Math.abs(result.payloads[0][0] - expected.payloads[0][0]) < 0.0000001 );
+  });
+  it('double invalid', function() {
+    expected = new packet.Packet("set", "typecheck/double", [null]);
+    [_, [result]] = this.codec.decode(("S200c:3ff3c,83126e978d\n"));
+    assert.equal(result.category, expected.category);
+    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
+    assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('enum', function() {
     expected = new packet.Packet("set", "typecheck/enum", ["item_2"]);

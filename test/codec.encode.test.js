@@ -156,6 +156,12 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
+  it('invalid u8', function() {
+    expected = utf8.encode("S2003:\n");
+    _packet = new packet.Packet("set", "typecheck/uint8", ["invalid"]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
   it('underflow_u8', function() {
     expected = utf8.encode("S2003:00\n");
     _packet = new packet.Packet("set", "typecheck/uint8", [-0xa5]);
@@ -324,9 +330,21 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
+  it('float invalid', function() {
+    expected = utf8.encode("S200b:\n");
+    _packet = new packet.Packet("set", "typecheck/float", [{value: "100.00"}]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
   it('double', function() {
     expected = utf8.encode("S200c:3ff3c083126e978d\n");
     _packet = new packet.Packet("set", "typecheck/double", [1.2344999999999999307]);
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('double invalid', function() {
+    expected = utf8.encode("S200c:\n");
+    _packet = new packet.Packet("set", "typecheck/double", ["not a double"]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
