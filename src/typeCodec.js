@@ -114,8 +114,9 @@ function decode_unsigned(item, bits) {
   try {
     return clamp(BigInt("0x" + item), 0n, (0x1n << bits) - 1n);
   }
-  catch {
-    return 0n;
+  catch (e){
+    const default_value = 0n;
+    return default_value;
   }
 }
 
@@ -130,7 +131,8 @@ function decode_signed(item, bits) {
     return clamp(value, -min_value, min_value - 1n)
   }
   catch {
-    return 0n;
+    const default_value = 0n;
+    return (default_value);
   }
 }
 
@@ -192,7 +194,8 @@ exports.decode_types = function decode_types(item, type) {
       }
     }
   }
-  catch {
+  catch (err) {
+    console.log(`Decode error: ${err}`)
     return null;
   }
   return null;

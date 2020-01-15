@@ -164,7 +164,7 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
-  it('underflow_u8', function() {
+  it('invalid_u8', function() {
     expected = new packet.Packet("set", "typecheck/uint8", [0x00n]);
     [_, [result]] = this.codec.decode(("S2003:-e3\n"));
     assert.equal(result.category, expected.category);
@@ -185,7 +185,7 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
-  it('underflow_u16', function() {
+  it('invalid_u16', function() {
     expected = new packet.Packet("set", "typecheck/uint16", [0x0000n]);
     [_, [result]] = this.codec.decode(("S2004:-0234\n"));
     assert.equal(result.category, expected.category);
@@ -206,7 +206,7 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
-  it('underflow_u32', function() {
+  it('invalid_u32', function() {
     expected = new packet.Packet("set", "typecheck/uint32", [0x00000000n]);
     [_, [result]] = this.codec.decode(("S2005:-00102234\n"));
     assert.equal(result.category, expected.category);
@@ -227,7 +227,7 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
-  it('underflow_u64', function() {
+  it('invalid_u64', function() {
     expected = new packet.Packet("set", "typecheck/uint64", [0x0n]);
     [_, [result]] = this.codec.decode(("S2006:-10223400000078\n"));
     assert.equal(result.category, expected.category);

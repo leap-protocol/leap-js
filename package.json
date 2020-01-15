@@ -5,7 +5,9 @@
   "main": "index.js",
   "bin": "cli.js",
   "scripts": {
-    "test": "mocha --reporter nyan"
+    "test": "mocha --reporter nyan",
+    "test-ci": "mocha --reporter list",
+    "coverage": "nyc npm run test-ci"
   },
   "repository": {
     "type": "git",
@@ -24,7 +26,8 @@
   },
   "homepage": "https://github.com/leap-protocol/leap-js#readme",
   "devDependencies": {
-    "mocha": "^6.2.2"
+    "mocha": "^6.2.2",
+    "nyc": "^15.0.0"
   },
   "dependencies": {
     "toml": "^3.0.0",
