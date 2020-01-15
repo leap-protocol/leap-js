@@ -35,8 +35,8 @@ describe('VerifyBasic', function() {
     const config = open_toml(this.valid_small_toml);
     assert.equal(this.verifier.verify(config), true);
   });
-  it('valid empty', function() {
-    const config = {};
+  it('invalid empty', function() {
+    const config = [];
     assert.equal(this.verifier.verify(config), false);
   });
 });
@@ -49,6 +49,10 @@ describe('VerifyData', function() {
   });
   it('no_data', function() {
     delete this.config.data;
+    assert.equal(this.verifier.verify(this.config), false);
+  });
+  it('data is not an object', function() {
+    this.config['data'] = 10;
     assert.equal(this.verifier.verify(this.config), false);
   });
   it('incorrect_data_type', function() {
@@ -98,6 +102,10 @@ describe('VerifyData', function() {
   it('item_does_not_contain_data_or_type', function() {
     this.config['data'] = [{"item": {"addr": "0000"}}];
     assert.equal(this.verifier.verify(this.config), false);
+  });
+  it('first address not required', function() {
+    delete this.config['data'][0]['protocol']['addr'];
+    assert.equal(this.verifier.verify(this.config), true);
   });
   it('invalid_address_value_type', function() {
     this.config['data'][0]['protocol']['addr'] = 0x1000;

@@ -13,16 +13,36 @@ exports.verify_quiet = function verify_quiet(filepath){
 }
 
 function do_verify(filepath, print){
-  const data = fs.readFileSync(filepath);
+  const data = verify_open_file(filepath, print);
+
+  if (data.length != 0) {
+    const config = verify_load_config(data, print);
+
+    if (config.length != 0) {
+      return verify_check_config(config, print);
+    }
+  }
+  return false;
+}
+
+function verify_open_file(filepath, print) {
+  let data;
+  try {
+    data = fs.readFileSync(filepath);
+  }
+  catch {
+    data = "";
+  }
   if (data.length == 0) {
     if (print) {
       console.log(`File ${filepath} cannot be opened, maybe it doesn't exist?`);
     }
-    return false;
   }
+  return data;
+}
 
+function verify_load_config(data, print) {
   let config;
-  let invalid = false;
   try {
     config = JSON.parse(data);
   }
@@ -36,36 +56,31 @@ function do_verify(filepath, print){
     catch {
       config = "";
     }
-    if (config.length == 0) {
-      invalid = true;
-    }
-  }
-
-  if (invalid) {
-    if (print) {
+    if ((config.length == 0) && print) {
       console.log(`Verification of ${filepath} failed`);
       console.log("Invalid JSON/TOML");
     }
-    return false;
   }
 
-  v = new exports.Verifier();
+  return config;
+}
 
-  result = v.verify(config);
-  if (result == false) {
-    if (print) {
+function verify_check_config(config, print) {
+  const v = new exports.Verifier();
+
+  const result = v.verify(config);
+  if (print) {
+    if (result == true) {
+      console.log(`Verification of ${filepath} passed`);
+    } 
+    else {
       console.log(`Verification of ${filepath} failed`);
       v.print_failure();
       console.log(config);
     }
-    return false;
   }
-  else {
-    if (print) {
-      console.log(`Verification of ${filepath} passed`);
-    }
-    return true;
-  }
+
+  return result;
 }
 
 
