@@ -1,7 +1,7 @@
 const assert = require('assert');
 const toml = require('toml');
 const fs= require('fs');
-const verify = require('../src/verify');
+const configVerifier = require('../src/configVerifier');
 
 function open_json(filepath) {
   return JSON.parse(fs.readFileSync(filepath));
@@ -13,7 +13,7 @@ function open_toml(filepath) {
 
 describe('VerifyBasic', function() {
   beforeEach(function() {
-    this.verifier = new verify.Verifier();
+    this.verifier = new configVerifier.ConfigVerifier();
     this.valid_json = "test/fake/protocol.json";
     this.valid_small_json = "test/fake/protocol-small.json";
     this.valid_toml = "test/fake/protocol.toml";
@@ -43,7 +43,7 @@ describe('VerifyBasic', function() {
 
 describe('VerifyData', function() {
   beforeEach(function() {
-    this.verifier = new verify.Verifier();
+    this.verifier = new configVerifier.ConfigVerifier();
     this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
@@ -168,7 +168,7 @@ describe('VerifyData', function() {
 
 describe('VerifySymbols', function() {
   beforeEach(function() {
-    this.verifier = new verify.Verifier();
+    this.verifier = new configVerifier.ConfigVerifier();
     this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
@@ -236,7 +236,7 @@ describe('VerifySymbols', function() {
 
 describe('VerifyCategory', function() {
   beforeEach(function() {
-    this.verifier = new verify.Verifier();
+    this.verifier = new configVerifier.ConfigVerifier();
     this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });
@@ -289,7 +289,7 @@ describe('VerifyCategory', function() {
 
 describe('VerifyVersion', function() {
   beforeEach(function() {
-    this.verifier = new verify.Verifier();
+    this.verifier = new configVerifier.ConfigVerifier();
     this.valid = "test/fake/protocol.json";
     this.config = open_json(this.valid);
   });

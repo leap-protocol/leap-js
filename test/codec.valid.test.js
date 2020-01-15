@@ -24,5 +24,9 @@ describe('Codec Valid', function() {
     c = new codec.Codec("test/fake/bad-config.json");
     assert.equal(c.valid(), false);
   });
+  it('file doesnt exist', function() {
+    c = new codec.Codec("test/fake/non-existant-config.json");
+    assert.equal(c.valid(), false);
+  });
 });
 
