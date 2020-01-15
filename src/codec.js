@@ -205,7 +205,6 @@ exports.Codec = class Codec {
   }
 
   _generate_maps(protocol_root) {
-    const count = explore.count_to_path(protocol_root, null);
     const branches = explore.extract_branches(protocol_root, []);
     const addr_path = [];
     const roots = [];

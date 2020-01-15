@@ -88,30 +88,24 @@ exports.Verifier = class Verifier {
     if (config.length == 0) {
       this.section = "Config";
       this.print_failure = "Configuration is empty";
-      return false;
     }
-
-    if (this.verify_category(config) == false) {
+    else if (this.verify_category(config) == false) {
       this.section = "Category";
-      return false;
     }
-
-    if (this.verify_version(config) == false) {
+    else if (this.verify_version(config) == false) {
       this.section = "Version";
-      return false;
     }
-
-    if (this.verify_symbols(config) == false) {
+    else if (this.verify_symbols(config) == false) {
       this.section = "Symbols";
-      return false;
     }
-
-    if (this.verify_data(config, "root") == false) {
+    else if (this.verify_data(config, "root") == false) {
       this.section = "Data";
-      return false;
+    }
+    else {
+      return true;
     }
 
-    return true;
+    return false;
   }
 
   update_addr(addr, depth) {
@@ -142,16 +136,16 @@ exports.Verifier = class Verifier {
     }
     this.depth = Math.max(this.depth, depth);
 
-    if (this.current_addr == null) {
-      this.current_addr = this._to_addr_string(next_addr);
-      return true;
+    if (this.current_addr != null) {
+      if (next_addr <= this._to_addr_int(this.current_addr)) {
+        this.failure = `Next address ${this._to_addr_string(next_addr)} is lower than previous address ${this.current_addr}`;
+      }
+      else if (next_addr > 0xFFFF) {
+        this.failure = `Next address 0x${this._to_addr_string(next_addr)} has overrun 0xFFFF`;
+      }
     }
-    else if (next_addr <= this._to_addr_int(this.current_addr)) {
-      this.failure = `Next address ${this._to_addr_string(next_addr)} is lower than previous address ${this.current_addr}`;
-      return false;
-    }
-    else if (next_addr > 0xFFFF) {
-      this.failure = `Next address 0x${this._to_addr_string(next_addr)} has overrun 0xFFFF`;
+
+    if (this.failure !== "") {
       return false;
     }
     else {
@@ -404,31 +398,31 @@ exports.Verifier = class Verifier {
   verify_version(config) {
     if (("version" in config) == false) {
       this.failure = "Missing version key in root data structure";
-      return false;
     }
-
-    const version = config["version"];
-    const keys = Object.keys(version);
-    const segments = ["major", "minor", "patch"];
-
-    for (let i in segments) {
-      const segment = segments[i];
-      if ((segment in version) == false) {
-        this.failure = `Missing "${segment}" in "version" data structure`;
-        return false;
+    else {
+      const version = config["version"];
+      const keys = Object.keys(version);
+      const segments = ["major", "minor", "patch"];
+  
+      for (let i in segments) {
+        const segment = segments[i];
+        if ((segment in version) == false) {
+          this.failure = `Missing "${segment}" in "version" data structure`;
+          break;
+        }
+  
+        if (Number.isInteger(version[segment]) == false) {
+          this.failure = `"version" "${segment}" must be an integer`;
+          break;
+        }
       }
 
-      if (Number.isInteger(version[segment]) == false) {
-        this.failure = `"version" "${segment}" must be an integer`;
-        return false;
+      if (keys.length != 3) {
+        this.failure = '"version" must only contain items "major", "minor" and "patch"';
       }
     }
 
-    if (keys.length != 3) {
-      this.failure = '"version" must only contain items "major", "minor" and "patch"';
-      return false;
-    }
-    return true;
+    return (this.failure === "");
   }
 
   _to_addr_string(ivalue) {
