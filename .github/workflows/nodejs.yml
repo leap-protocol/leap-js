@@ -38,7 +38,7 @@ jobs:
         npm install
         npm build --if-present
     - name: Test & publish code coverage
-      uses: paambaati/codeclimate-action@v2.4.0
+      uses: paambaati/codeclimate-action@v2.3.0
       env:
         CC_TEST_REPORTER_ID: c516901ecaa10a7f3338a87f0d65d29a3077f4c026c8f2acab3ac5c6e2887138
       with:
