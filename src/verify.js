@@ -71,11 +71,7 @@ function do_verify(filepath, print){
 
 exports.Verifier = class Verifier {
   constructor() {
-    this.section = "";
-    this.failure = "";
-    this.addr = [];
-    this.current_addr = null;
-    this.depth = -1;
+    this._reset();
   }
 
   _reset() {
@@ -219,13 +215,8 @@ exports.Verifier = class Verifier {
 
     for (let i in keys) {
       const key = keys[i];
-      if (/^[A-Za-z]/.exec(key) == null)  {
+      if ((/^[A-Za-z]/.exec(key) == null) || (/^[A-Za-z0-9\-_]+$/.exec(key) == null)) {
         this.failure = `data item key "${key}" in "${branch}" invalid. Keys must be strings containing only alpha numeric, dash(-) and underscore(_) characters`;
-        return false;
-      }
-
-      if (/^[A-Za-z0-9\-_]+$/.exec(key) == null) {
-        this.failure = `data item key "${key}" in "${branch}" invalid. Keys may only contain alpha numeric, dash(-) and underscore(_) characters`;
         return false;
       }
 
