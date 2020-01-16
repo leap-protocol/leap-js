@@ -1,6 +1,7 @@
 const fs = require('fs');
 const utf8 = require('utf8');
 const toml = require('toml');
+const yaml = require('js-yaml');
 const packet = require('./packet');
 const explore = require('./explore');
 const typeCodec = require('./typeCodec');
@@ -35,7 +36,12 @@ exports.Codec = class Codec {
           this._config = toml.parse(data);
         }
         catch {
-          this.is_valid = false;
+          try {
+            this._config = yaml.load(data);
+          }
+          catch {
+            this.is_valid = false;
+          }
         }
       }
     }

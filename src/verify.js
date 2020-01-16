@@ -1,5 +1,6 @@
 
 
+const yaml = require('js-yaml');
 const toml = require('toml');
 const fs = require('fs');
 const configVerifier = require('./configVerifier');
@@ -18,8 +19,8 @@ function do_verify(filepath, print){
   if (data.length != 0) {
     const config = verify_load_config(data, print);
 
-    if (config.length != 0) {
-      return verify_check_config(config, print);
+    if (typeof config === "object" && config.length != 0) {
+      return verify_check_config(config, print, filepath);
     }
   }
   return false;
@@ -48,24 +49,28 @@ function verify_load_config(data, print) {
   }
   catch {
     config = "";
-  }
-  if (config.length == 0) {
     try {
       config = toml.parse(data);
     }
     catch {
       config = "";
-    }
-    if ((config.length == 0) && print) {
-      console.log(`Verification of ${filepath} failed`);
-      console.log("Invalid JSON/TOML");
+      try {
+        config = yaml.load(data);
+      }
+      catch {
+        config = "";
+        if (print) {
+          console.log(`Verification of ${filepath} failed`);
+          console.log("Invalid JSON/TOML/YAML");
+        }
+      }
     }
   }
 
   return config;
 }
 
-function verify_check_config(config, print) {
+function verify_check_config(config, print, filepath) {
   const v = new configVerifier.ConfigVerifier();
 
   const result = v.verify(config);
@@ -75,6 +80,7 @@ function verify_check_config(config, print) {
     }
     else {
       console.log(`Verification of ${filepath} failed`);
+      console.log(config);
       v.print_failure();
       console.log(config);
     }
