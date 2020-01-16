@@ -1,6 +1,5 @@
-#!/usr/bin/env node
-
-const leap = require("./index.js");
+const argparse = require("argparse")
+const leap = require("./index");
 
 console.log(leap.verify("test.json"));
 
