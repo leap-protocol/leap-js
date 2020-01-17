@@ -3,7 +3,9 @@
   "version": "1.0.2",
   "description": "Legible Encoding for Addressable Packets",
   "main": "index.js",
-  "bin": "cli.js",
+  "bin": {
+    "leap": "./cli.js"
+  },
   "scripts": {
     "test": "mocha --reporter nyan",
     "test-ci": "mocha --reporter list",
@@ -30,6 +32,7 @@
     "nyc": "^15.0.0"
   },
   "dependencies": {
+    "argparse": "^1.0.10",
     "js-yaml": "^3.13.1",
     "toml": "^3.0.0",
     "utf8": "^3.0.0"

@@ -38,7 +38,7 @@ exports.ConfigVerifier = class ConfigVerifier {
     }
     else if (this._data_verifier.verify(config, "root") == false) {
       this.section = this._data_verifier.get_section();
-      this.print_failure = this._data_verifier.get_failure();
+      this.failure = this._data_verifier.get_failure();
     }
     else {
       return true;
