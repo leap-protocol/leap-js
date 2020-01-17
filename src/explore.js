@@ -1,5 +1,13 @@
-const protocolKey = require('./protocolKey.js');
+// Copyright © 2020 Hoani Bryson
+// License: MIT (https://mit-license.org/)
+//
+// Explore
+//
+// A group of helper functions which search through L3aP protocol
+// configurations.
+//
 
+const protocolKey = require('./protocolKey.js');
 
 exports.count_depth = function count_depth(root) {
   let count = 0

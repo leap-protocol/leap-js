@@ -1,3 +1,11 @@
+// Copyright © 2020 Hoani Bryson
+// License: MIT (https://mit-license.org/)
+//
+// Packet
+//
+// The decoded L3aP packet object
+//
+
 exports.Packet = class Packet {
   constructor(category, path=null, payload=null) {
     this.category = category;

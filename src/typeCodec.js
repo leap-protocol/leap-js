@@ -1,4 +1,10 @@
-
+// Copyright © 2020 Hoani Bryson
+// License: MIT (https://mit-license.org/)
+//
+// Type codec
+//
+// Methods for encoding and decoding individual data items
+//
 
 
 exports.encode_types = function encode_types(item, type) {

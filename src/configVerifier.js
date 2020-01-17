@@ -1,7 +1,12 @@
+// Copyright © 2020 Hoani Bryson
+// License: MIT (https://mit-license.org/)
+//
+// Configuration Verifier
+//
+// Verifies the a L3aP protocol configuration object
+//
 
-const protocolKey = require('./protocolKey.js');
 const dataVerifier = require('./configDataVerifier.js');
-
 
 exports.ConfigVerifier = class ConfigVerifier {
   constructor() {

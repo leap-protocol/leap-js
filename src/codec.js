@@ -1,3 +1,11 @@
+// Copyright © 2020 Hoani Bryson
+// License: MIT (https://mit-license.org/)
+//
+// Codec
+//
+// L3aP codec for encoding and decoding packets
+//
+
 const fs = require('fs');
 const utf8 = require('utf8');
 const toml = require('toml');

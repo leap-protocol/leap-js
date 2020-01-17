@@ -1,4 +1,10 @@
-
+// Copyright © 2020 Hoani Bryson
+// License: MIT (https://mit-license.org/)
+//
+// Verify
+//
+// Provides high level functions for verifying a L3aP config file
+//
 
 const yaml = require('js-yaml');
 const toml = require('toml');
