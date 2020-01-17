@@ -12,12 +12,12 @@ function configure_parser() {
     }
   );
   parser.addArgument(
-    '--validate',
+    '--verify',
     {
       help: '',
       defaultValue: null,
       metavar: 'filename',
-      dest: 'validate'
+      dest: 'verify'
     }
   );
   return parser;
