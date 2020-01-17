@@ -14,13 +14,27 @@ function configure_parser() {
   return parser;
 }
 
+function args_to_settings(args) {
+  const default_generate_suffix = ".yaml";
+
+  if (args.generate != null) {
+    if (/(.yaml|.json|.toml)$/.exec(args.generate) == null) {
+      args.generate += default_generate_suffix;
+    }
+  }
+
+  return args;
+}
+
 exports.cli_parse = function cli_parse() {
 
   const parser = configure_parser();
 
-  const args = parser.parseArgs()
+  const args = parser.parseArgs();
 
-  return args;
+  const settings = args_to_settings(args);
+
+  return settings;
 }
 
 if (require.main === module) {
