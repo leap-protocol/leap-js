@@ -10,6 +10,11 @@ describe('Basic CLI commands', function() {
     result = cli_parse.cli_parse();
     assert("generate" in result);
   });
+  it('validate', function() {
+    process.argv = ['node','cli.test.js'];
+    result = cli_parse.cli_parse();
+    assert("validate" in result);
+  });
 });
 
 describe('Generate CLI', function() {
@@ -42,6 +47,11 @@ describe('Generate CLI', function() {
     process.argv = ['node','cli.test.js', '--generate', 'new.js'];
     result = cli_parse.cli_parse();
     assert.equal(result.generate, 'new.js.yaml');
+  });
+  it ('handle empty string', function() {
+    process.argv = ['node','cli.test.js', '--generate', ''];
+    result = cli_parse.cli_parse();
+    assert.equal(result.generate, 'config.yaml');
   });
 });
 
