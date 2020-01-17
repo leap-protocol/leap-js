@@ -9,19 +9,18 @@
 
 const protocolKey = require('./protocolKey.js');
 
-exports.count_depth = function count_depth(root) {
+function count_depth(root) {
   let count = 0
 
-  if (protocolKey.DATA in root) {
-    const data = root[protocolKey.DATA]
-    for (i in data) {
-      const item = data[i]
-      count += 1
-      const name = Object.keys(item).pop();
-      if (protocolKey.DATA in item[name]) {
-        count += count_depth(item[name])
-      }
+  const data = root[protocolKey.DATA]
+  for (i in data) {
+    const item = data[i]
+    count += 1
+    const name = Object.keys(item).pop();
+    if (protocolKey.DATA in item[name]) {
+      count += count_depth(item[name])
     }
+
   }
   return count;
 }
@@ -38,7 +37,7 @@ exports.count_to_path = function count_to_path(root, path) {
 
   let count = 0;
   if (path == null) {
-    return exports.count_depth(root)
+    return count_depth(root)
   }
   const search = path[0];
   let found_path = false;
@@ -53,7 +52,7 @@ exports.count_to_path = function count_to_path(root, path) {
         continue;
       }
       else {
-        count += exports.count_depth(item[name]);
+        count += count_depth(item[name]);
       }
     }
     else {

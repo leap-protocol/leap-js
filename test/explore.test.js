@@ -17,7 +17,13 @@ countries_root = {
   { Rarotonga: { type: "i32" } }
 ] };
 
+
 describe('Count to path', function() {
+  it('Bad Root', function() {
+    const expected = null;
+    const result = explore.count_to_path(countries_root['data'], null);
+    assert.equal(result, expected);
+  });
   it('Null will count depth', function() {
     const expected = 7;
     const result = explore.count_to_path(countries_root, null);
@@ -56,6 +62,11 @@ describe('Count to path', function() {
 });
 
 describe('Get Struct', function() {
+  it("Bad root", function() {
+    const expected = null;
+    const result = explore.get_struct(countries_root['data'], ["Rarotonga"]);
+    assert.equal(result, expected);
+  });
   it('Get none', function() {
     const expected = null;
     const result = explore.get_struct(countries_root, ["Florida"]);
@@ -89,6 +100,11 @@ describe('Extract Types', function() {
       fs.readFileSync(CONFIG_PATH)
     );
   });
+  it('Invalid path', function() {
+    const expected = [];
+    const result = explore.extract_types(this.root, ["invalid"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
+  });
   it('Simple type', function() {
     const expected = ["bool"];
     const result = explore.extract_types(this.root, ["ping"]);
@@ -109,6 +125,12 @@ describe('Extract Types', function() {
     const result = explore.extract_types(this.root, ["protocol"]);
     assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
+  it('Ignore bad item', function() {
+    delete this.root.data[0].protocol.data[0].version.data;
+    const expected = ["string"];
+    const result = explore.extract_types(this.root, ["protocol"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
+  });
 });
 
 describe('Extract Decendants', function() {
@@ -116,6 +138,11 @@ describe('Extract Decendants', function() {
     this.root = JSON.parse(
       fs.readFileSync(CONFIG_PATH)
     );
+  });
+  it('Invalid path', function() {
+    const expected = [];
+    const result = explore.extract_decendants(this.root, ["invalid"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
   it('No decendant', function() {
     const expected = [""];
@@ -139,6 +166,11 @@ describe('Extract Branches', function() {
     this.root = JSON.parse(
       fs.readFileSync(CONFIG_PATH)
     );
+  });
+  it('Invalid path', function() {
+    const expected = [];
+    const result = explore.extract_branches(this.root, ["invalid"]);
+    assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
   it('None', function() {
     const expected = [""];

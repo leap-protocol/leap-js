@@ -180,7 +180,6 @@ exports.cli_parse = function cli_parse() {
 
 if (require.main === module) {
   settings = exports.cli_parse()
-
   console.log(settings)
 }
 
