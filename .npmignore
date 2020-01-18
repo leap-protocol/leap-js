@@ -1,2 +1,4 @@
 test*
 todo.txt
+.nyc*
+.github*

@@ -1,13 +1,1 @@
-[X] Encode strings to bytes
-[X] Unpack
-[X] Packet testing
-  [X] Codec fake
-[X] Unpacking using an invalid codec
-[X] Codec validity testing
-[] Readme documentation
-
-[] NPM release
-  [X] Add CLI for generating config and verifying config
-  [] Figure out how to release
-  [] Test a release
-  [] Ship it!
+[] Get CodeClimate to B ranking
