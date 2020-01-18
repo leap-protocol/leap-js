@@ -81,7 +81,8 @@ exports.encode_types = function encode_types(item, type) {
       return (item == true) ? ("1") : ("0");
     }
     else if (type == "float") {
-      if (typeof item != "number") {
+      item = Number(item);
+      if (Number.isNaN(item)) {
         return "";
       }
       const view = new DataView(new ArrayBuffer(4));
@@ -90,7 +91,8 @@ exports.encode_types = function encode_types(item, type) {
       return to_padded_hex_string(value, 8);
     }
     else if (type == "double") {
-      if (typeof item != "number") {
+      item = Number(item);
+      if (Number.isNaN(item)) {
         return "";
       }
       const view = new DataView(new ArrayBuffer(8));

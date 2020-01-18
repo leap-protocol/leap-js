@@ -380,7 +380,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('float invalid', function() {
     expected = utf8.encode("S200b:\n");
-    _packet = new packet.Packet("set", "typecheck/float", [{value: "100.00"}]);
+    _packet = new packet.Packet("set", "typecheck/float", [{value: "100()00"}]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
