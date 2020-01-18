@@ -35,6 +35,24 @@ exports.DataVerifier = class DataVerifier {
   }
 
   update_addr(addr, depth) {
+    const next_addr = this.get_next_address(addr, depth);
+
+    this.depth = Math.max(this.depth, depth);
+
+    if (this.current_addr != null) {
+      this.verify_next_address(next_addr);
+    }
+
+    if (this.failure !== "") {
+      return false;
+    }
+    else {
+      this.current_addr = this._to_addr_string(next_addr);
+      return true;
+    }
+  }
+
+  get_next_address(addr, depth) {
     let next_addr;
     if (addr == null) {
       if (this.current_addr == null) {
@@ -60,23 +78,17 @@ exports.DataVerifier = class DataVerifier {
         next_addr += this._to_addr_int(this.addr[i]);
       }
     }
-    this.depth = Math.max(this.depth, depth);
+    return next_addr;
+  }
 
-    if (this.current_addr != null) {
-      if (next_addr <= this._to_addr_int(this.current_addr)) {
-        this.failure = `Next address ${this._to_addr_string(next_addr)} is lower than previous address ${this.current_addr}`;
-      }
-      else if (next_addr > 0xFFFF) {
-        this.failure = `Next address 0x${this._to_addr_string(next_addr)} has overrun 0xFFFF`;
-      }
+  verify_next_address(next_address) {
+    if (next_address <= this._to_addr_int(this.current_addr)) {
+      this.failure = `Next address ${this._to_addr_string(next_address)} is `+
+        `lower than previous address ${this.current_addr}`;
     }
-
-    if (this.failure !== "") {
-      return false;
-    }
-    else {
-      this.current_addr = this._to_addr_string(next_addr);
-      return true;
+    else if (next_address > 0xFFFF) {
+      this.failure = `Next address 0x${this._to_addr_string(next_address)} `+
+        `has overrun 0xFFFF`;
     }
   }
 
@@ -91,123 +103,115 @@ exports.DataVerifier = class DataVerifier {
   verify_data(config, branch) {
     if (("data" in config) == false) {
       this.failure = `Missing data key in ${branch} data structure`;
-      return false;
     }
-
-    const data = config["data"];
-    if (typeof data !== "object") {
-      this.failure = `data in ${branch} must be an array of items`;
-      return false;
-    }
-
-    if (data.length == 0) {
-      this.failure = `data in ${branch} is empty`;
-      return false;
-    }
-
-    for (let i in data) {
-      const item = data[i];
-
-      if (this.verify_item(item, branch) == false) {
-        return false;
+    else {
+      const data = config["data"];
+      if (typeof data !== "object") {
+        this.failure = `data in ${branch} must be an array of items`;
+      }
+      else {
+        if (data.length == 0) {
+          this.failure = `data in ${branch} is empty`;
+        }
+        else {
+          for (let i in data) {
+            if (this.verify_item(data[i], branch) == false) {
+              break;
+            }
+          }
+        }
       }
     }
-
-    return true;
+    return (this.failure.length === 0);
   }
 
   verify_item(item, branch) {
     if (typeof item !== "object") {
       this.failure = `data item "${item}" in ${branch} must be an object`;
+    }
+    else {
+      const keys = Object.keys(item);
+      const key = keys[0];
+
+      if (keys.length != 1) {
+        this.failure = `data items in ${branch} must have only one key-pair per object`;
+      }
+      else if (this.verify_item_name(key, branch)) {
+        if (branch == "root") {
+          branch = key;
+        }
+        else {
+          branch = branch + "/" + key;
+        }
+    
+        return this.verify_values(item[key], branch);
+      }
+    }
+
+    return (this.failure.length === 0);
+  }
+
+  verify_item_name(item_name, branch) {
+    const invalid_first_character = (/^[A-Za-z]/.exec(item_name) == null);
+    const invalid_full_name = (/^[A-Za-z0-9\-_]+$/.exec(item_name) == null);
+
+    if ( invalid_first_character || invalid_full_name) {
+      this.failure = `data item key "${item_name}" in "${branch}" invalid. `+
+        `Keys must be strings containing only alpha numeric, dash(-) and`+
+        ` underscore(_) characters`;
       return false;
     }
-
-    const keys = Object.keys(item);
-
-    if (keys.length != 1) {
-      this.failure = `data items in ${branch} must have only one key-pair per object`;
-      return false;
-    }
-
-    for (let i in keys) {
-      const key = keys[i];
-      if ((/^[A-Za-z]/.exec(key) == null) || (/^[A-Za-z0-9\-_]+$/.exec(key) == null)) {
-        this.failure = `data item key "${key}" in "${branch}" invalid. Keys must be strings containing only alpha numeric, dash(-) and underscore(_) characters`;
-        return false;
-      }
-
-      if (branch == "root") {
-        branch = key;
-      }
-      else {
-        branch = branch + "/" + key;
-      }
-
-      if (this.verify_values(item[key], branch) == false) {
-        return false;
-      }
-    }
-
-    return true
+    return true;
   }
 
   verify_values(values, branch) {
     const depth = (branch.match(/\//) || []).length;
     if (typeof values !== "object") {
       this.failure = `value of ${branch} must be an object`;
-      return false;
-    }
-
-    if ((protocolKey.DATA in values) == (protocolKey.TYPE in values)) {
-      this.failure = `object in ${branch} must have either a "${protocolKey.DATA}" or "${protocolKey.TYPE}" key, but not both`;
-      return false;
-    }
-
-    if (protocolKey.ADDR in values) {
-      if (this.verify_address(values[protocolKey.ADDR], branch) == false) {
-        return false;
-      }
-
-      if (this.update_addr(values[protocolKey.ADDR], depth) == false) {
-        this.failure += ` at ${branch}`;
-        return false;
-      }
     }
     else {
-      if (this.update_addr(null, depth) == false) {
+      if ((protocolKey.DATA in values) == (protocolKey.TYPE in values)) {
+        this.failure = `object in ${branch} must have either a "${protocolKey.DATA}" or "${protocolKey.TYPE}" key, but not both`;
+      }
+      else if (protocolKey.ADDR in values) {
+        if (this.verify_address(values[protocolKey.ADDR], branch)) {
+          if (this.update_addr(values[protocolKey.ADDR], depth) == false) {
+            this.failure += ` at ${branch}`;
+          }
+        }
+      }
+      else if (this.update_addr(null, depth) == false) {
         this.failure += ` at ${branch}`;
-        return false;
+      }
+
+      if (this.failure.length === 0) {
+        if (protocolKey.TYPE in values) {
+          this.verify_type(values[protocolKey.TYPE], branch);
+        }
+      }
+
+      if (this.failure.length === 0) {
+        if (protocolKey.DATA in values) {
+          this.verify_data(values, branch);
+        }
       }
     }
 
-    if (protocolKey.TYPE in values) {
-      if (this.verify_type(values[protocolKey.TYPE], branch) == false) {
-        return false;
-      }
-    }
-
-    if (protocolKey.DATA in values) {
-      if (this.verify_data(values, branch) == false) {
-        return false;
-      }
-    }
-
-    return true;
+    return (this.failure.length === 0);
   }
 
 
   verify_address(addr, branch) {
     if (typeof addr !== "string") {
       this.failure = `"${protocolKey.ADDR}" of ${branch} must be a string`;
-      return false;
     }
 
-    if (/^[A-Fa-f0-9\-_]{4}$/.exec(addr) == null) {
-      this.failure = `"${protocolKey.ADDR}" of "${addr}" in ${branch} invalid. Addresses are four character hexidecimal strings`;
-      return false;
+    else if (/^[A-Fa-f0-9\-_]{4}$/.exec(addr) == null) {
+      this.failure = `"${protocolKey.ADDR}" of "${addr}" in ${branch} `+
+        `invalid. Addresses are four character hexidecimal strings`;
     }
 
-    return true;
+    return (this.failure.length === 0);
   }
 
 
@@ -216,26 +220,33 @@ exports.DataVerifier = class DataVerifier {
 
     if ((typeof type !== "string") && (typeof type !== "object")) {
       this.failure = `"${protocolKey.TYPE}" of "${branch}", "${type}" must be a string (or an array if (enum)`;
-      return false;
     }
-
-    if (typeof type === "string") {
+    else if (typeof type === "string") {
       if (valid_types.includes(type) == false) {
         this.failure = `${protocolKey.TYPE}: "${type}" of "${branch}" is not a valid type, see docs for more valid types`;
-        return false;
       }
     }
 
-    if (typeof type === "object") {
-      for (let i in type) {
-        const item = type[i];
-        if ((typeof item !== "string") || /^[A-Za-z0-9\-_]+$/.exec(item) === null) {
-          this.failure = `items "${item}" in ${protocolKey.TYPE} enum of "${branch}" may only be strings using alpha-numeric characters, dashes (-) and underscores (_)`;
+    if (this.failure.length === 0) {
+      this.verify_typeset(type, branch);
+    }
+
+    return (this.failure.length === 0);
+  }
+
+  verify_typeset(typeset, branch) {
+    if (typeof typeset === "object") {
+      for (let i in typeset) {
+        const item = typeset[i];
+        if ((typeof item !== "string") 
+          || /^[A-Za-z0-9\-_]+$/.exec(item) === null) {
+          this.failure = `items "${item}" in ${protocolKey.TYPE} enum of `+
+            `"${branch}" may only be strings using alpha-numeric characters, `+
+            `dashes (-) and underscores (_)`;
           return false;
         }
       }
     }
-
     return true;
   }
 
