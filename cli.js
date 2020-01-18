@@ -13,9 +13,11 @@ const packet = require("./src/packet");
 const leap = require("./index");
 const directory = require('path').dirname(__filename)
 
-// Generate the specified filetype
-function handle_generate(filename) {
+
+// fetch a config file's data based on filename extension
+function fetch_default_config(filename) {
   let data = null;
+  
   if (/.json$/.exec(filename) !== null) {
     data = fs.readFileSync(
       directory + '/src/config/generate.json'
@@ -31,6 +33,13 @@ function handle_generate(filename) {
       directory + '/src/config/generate.yaml'
     );
   }
+
+  return data;
+}
+
+// Generate the specified filetype
+function handle_generate(filename) {
+  const data = fetch_default_config(filename);
 
   if (data == null) {
     console.log(

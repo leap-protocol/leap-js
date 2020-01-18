@@ -6,62 +6,29 @@
 // L3aP codec for encoding and decoding packets
 //
 
-const fs = require('fs');
 const utf8 = require('utf8');
-const toml = require('toml');
-const yaml = require('js-yaml');
 const packet = require('./packet');
 const typeCodec = require('./typeCodec');
 const mapGenerator = require('./mapGenerator');
-const verify = require('./verify');
+const loadConfig = require('./loadConfig');
 
 
 exports.Codec = class Codec {
   constructor(filepath) {
-    let data;
     this.is_valid = false;
     this.encode_map = {};
     this.decode_map = {};
     this.start_to_category_map = {};
 
-    try {
-      data = fs.readFileSync(filepath);
-      this.is_valid = true;
-    }
-    catch (err) {
-      this.is_valid = false;
-      console.log("invlaid file");
-    }
+    const loader = new loadConfig.LoadConfig(filepath);
+    this.is_valid = loader.valid();
+    this._config = loader.config();
 
     if (this.is_valid) {
-      try {
-        this._config = JSON.parse(data);
-      }
-      catch {
-        try {
-          this._config = toml.parse(data);
-        }
-        catch {
-          try {
-            this._config = yaml.load(data);
-          }
-          catch {
-            this.is_valid = false;
-          }
-        }
-      }
-    }
-
-    if (this.is_valid) {
-      if (verify.verify_quiet(filepath)) {
-        [this.encode_map, this.decode_map] = mapGenerator.generate_maps(
-          this._config
-        );
-        this._map_categories();
-      }
-      else {
-        this.is_valid = false;
-      }
+      [this.encode_map, this.decode_map] = mapGenerator.generate_maps(
+        this._config
+      );
+      this._map_categories();
     }
   }
 
@@ -83,48 +50,70 @@ exports.Codec = class Codec {
     let encoded = "";
 
     for (let i in packets) {
-      const _packet = packets[i];
-      let internal = "";
-
       if (encoded != "") {
         encoded += this._config["end"];
       }
-      encoded += this._config["category"][_packet.category]
-
-      for (let j in _packet.paths) {
-        const path = _packet.paths[j];
-        const payload = _packet.payloads[j];
-
-        if (path != null) {
-          let encode_data;
-          // Detect compound packet and add compound character
-          if (internal != "") {
-            internal += this._config["compound"];
-          }
-
-          if (path in this.encode_map) {
-            encode_data = this.encode_map[path];
-          }
-          else {
-            console.log(`Could not encode with invalid branch: ${path}`);
-            return utf8.encode("");
-          }
-
-          internal += encode_data.addr;
-
-          if (payload != null) {
-            const count = Math.min(encode_data.types.length, payload.length);
-            for (let i = 0; i < count; i++) {
-              internal += this._config["separator"];
-              internal += typeCodec.encode_types(payload[i], encode_data.types[i]);
-            }
-          }
-        }
+      const encoded_packet = this._encode_packet(packets[i]);
+      if (encoded_packet == null) {
+        return utf8.encode('');
       }
-      encoded += internal
+      else {
+        encoded += encoded_packet;
+      }  
     }
     encoded += this._config["end"];
     return utf8.encode(encoded);
+  }
+
+  _encode_packet(_packet) {
+    let internal = "";
+    const start = this._config["category"][_packet.category]
+
+    for (let j in _packet.paths) {
+      const path = _packet.paths[j];
+      const payload = _packet.payloads[j];
+
+      if (path != null) {
+        // Detect compound packet and add compound character
+        if (internal != "") {
+          internal += this._config["compound"];
+        }
+
+        const encoded_single = this._encode_single(path, payload);
+        if (encoded_single != null) {
+          internal += encoded_single;
+        }
+        else {
+          return null;
+        }
+      }
+    }
+    return start + internal;
+  }
+
+  _encode_single(path, payload) {
+    let encode_data;
+    let encoded = "";
+
+    if (path in this.encode_map) {
+      encode_data = this.encode_map[path];
+    }
+    else {
+      console.log(`Could not encode with invalid branch: ${path}`);
+      return null;
+    }
+
+    encoded += encode_data.addr;
+
+    if (payload != null) {
+      const count = Math.min(encode_data.types.length, payload.length);
+      for (let i = 0; i < count; i++) {
+        encoded += this._config["separator"];
+        encoded += typeCodec.encode_types(payload[i], encode_data.types[i]);
+      }
+    }
+
+    return encoded;
   }
 
 
@@ -146,39 +135,51 @@ exports.Codec = class Codec {
     strings = strings.slice(0, strings.length - 1);
 
     for(let i in strings) {
-      let string = strings[i];
-      string = utf8.decode(string);
-      const start = string[0];
-      const category = this._category_from_start(start);
-      const _packet = new packet.Packet(category);
+      packets.push(
+        this._decode_packet(strings[i])
+      );
+    }
+    return [remainder, packets];
+  }
 
-      string = string.slice(1, string.length);
-      const subpackets = string.split(this._config["compound"]);
+  _decode_packet(string) {
+    string = utf8.decode(string);
+    const start = string[0];
+    const category = this._category_from_start(start);
+    const _packet = new packet.Packet(category);
 
-      for (let j in subpackets) {
-        const subpacket = subpackets[j];
-        const parts = subpacket.split(this._config["separator"]);
+    string = string.slice(1, string.length);
+    const subpackets = string.split(this._config["compound"]);
 
-        if (parts != ['']) {
-          const payload = [];
-          const addr = parts[0];
-          const decode_data = this.decode_map[addr];
-          const encoded_payload = parts.slice(1, parts.length);
-
-          for (let k = 0; k < encoded_payload.length; k++) {
-            const item = encoded_payload[k];
-            const type = decode_data.types[k];
-            payload.push(typeCodec.decode_types(item, type));
-          }
-
-          _packet.add(decode_data.path, payload);
-        }
+    for (let j in subpackets) {
+      const data = this._decode_subpacket(subpackets[j]);
+      if (data != null) {
+        const [path, payload] = data;
+        _packet.add(path, payload);
       }
-
-      packets.push(_packet);
     }
 
-    return [remainder, packets];
+    return _packet;
+  }
+
+  _decode_subpacket(subpacket) {
+    const parts = subpacket.split(this._config["separator"]);
+
+    if (parts != ['']) {
+      const payload = [];
+      const addr = parts[0];
+      const decode_data = this.decode_map[addr];
+      const encoded_payload = parts.slice(1, parts.length);
+
+      for (let k = 0; k < encoded_payload.length; k++) {
+        const item = encoded_payload[k];
+        const type = decode_data.types[k];
+        payload.push(typeCodec.decode_types(item, type));
+      }
+
+      return [decode_data.path, payload]
+    }
+    return null;
   }
 
   unpack(_packet) {
