@@ -110,15 +110,20 @@ exports.DataVerifier = class DataVerifier {
         this.failure = `data in ${branch} must be an array of items`;
       }
       else {
-        if (data.length == 0) {
-          this.failure = `data in ${branch} is empty`;
-        }
-        else {
-          for (let i in data) {
-            if (this.verify_item(data[i], branch) == false) {
-              break;
-            }
-          }
+        this.verify_dataset(data, branch);
+      }
+    }
+    return (this.failure.length === 0);
+  }
+
+  verify_dataset(data, branch) {
+    if (data.length == 0) {
+      this.failure = `data in ${branch} is empty`;
+    }
+    else {
+      for (let i in data) {
+        if (this.verify_item(data[i], branch) == false) {
+          break;
         }
       }
     }
