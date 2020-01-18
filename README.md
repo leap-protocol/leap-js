@@ -58,6 +58,19 @@ Example:
 const codec = new leap.Codec("leap-config.json");
 ```
 
+### is_valid = valid()
+* **is_valid** returns true or false
+
+Determines whether the codec has a valid configuration. If the config is not valid,  the codec cannot be used.
+
+Example:
+``` javascript
+const codec = new leap.Codec("leap-config.json");
+if (codec.valid()) {
+  ...
+}
+```
+
 ### bytes = encode(packets)
 * **packets** either a `leap.Packet` object or a list of `leap.packet` objects.
 * **bytes** utf-8 byte string
@@ -188,12 +201,13 @@ Files can have extension .yaml .json or .toml.
 
 **Encode a packet based on a config file:**
 
-`node node_modules/.bin/leap encode configfile category address payload`
+`node node_modules/.bin/leap encode configfile category address --payload payload`
 
 Example:
 ```sh
-hoani@Hoani-CPU sandbox % node cli.js encode config.json set item-1/child-1 10 1024.125
-TODO
+hoani@Hoani-CPU sandbox % node cli.js encode config.yaml set item-1/child-1 1 --payload 10 1024.125
+Encoded Packet ( set, item-1/child-1, [10,1024.125]):
+S0001:0a:44800400
 ```
 
 **Decode a packet based on a config file:**
@@ -202,8 +216,11 @@ TODO
 
 Example:
 ```sh
-hoani@Hoani-CPU sandbox % node cli.js decode config.json S8000:0a:????????
-TODO
+hoani@Hoani-CPU sandbox % node cli.js decode config.yaml S0001:0a:44800400
+Decoded Packet <S0001:0a:44800400>:
+   category - set
+   address "item-1/child-1/grand-child-1" = 10
+   address "item-1/child-1/grand-child-2" = 1024.125
 ```
 
 Help:

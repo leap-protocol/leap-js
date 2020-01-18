@@ -53,12 +53,17 @@ function handle_verify(filename) {
 // Verify encode a packet
 function handle_encode(filename, category, address, payload) {
   const c = new codec.Codec(filename);
-  const p = new packet.Packet(category, address, payload);
-  const encoded = c.encode(p);
-  console.log(``+
-    `Encoded Packet ( ${category}, ${address}, [${payload.toString()}]):\n`+
-    `${encoded}`
-  );
+  if (c.valid() == false) {
+    verify.verify(filename);
+  }
+  else {
+    const p = new packet.Packet(category, address, payload);
+    const encoded = c.encode(p);  
+    console.log(``+
+      `Encoded Packet ( ${category}, ${address}, [${payload.toString()}]):\n`+
+      `${encoded}`
+    );
+  }
 }
 
 // Verify encode a packet

@@ -7,7 +7,7 @@
 [] Readme documentation
 
 [] NPM release
-  [] Add CLI for generating config and verifying config
+  [X] Add CLI for generating config and verifying config
   [] Figure out how to release
   [] Test a release
   [] Ship it!

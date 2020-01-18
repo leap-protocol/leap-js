@@ -1,0 +1,29 @@
+
+separator: ":"
+compound: "|"
+end: "\n"
+
+version:
+  major: 1
+  minor: 0
+  patch: 0
+
+category:
+  get: "G"
+  set: "S"
+  ack: "A"
+  nak: "N"
+  sub: "B"
+  pub: "P"
+
+data:
+  - item-1:
+      addr: "0000"
+      data:
+        - child-1:
+            data:
+            - grand-child-1: { type: "u8" }
+            - grand-child-2: { type: "float" }
+        - child-2: { type: "string" }
+  - item-2: { addr: "2000", type: "none" }
+
