@@ -8,15 +8,31 @@
 
 const arg_parse = require('argparse')
 
-function add_command_generate(subparsers) {
-  const supparser = subparsers.addParser(
-    'generate',
+function filter_non_string(value) {
+  if (value == '' || (typeof value !== 'string')) {
+    return null;
+  }
+  return value;
+}
+
+function new_subparser(subparsers, name, help) {
+  const subparser = subparsers.addParser(
+    name,
     {
-      addHelp:true,
-      help: "Generate an empty yaml, json, or toml config file"
+      addHelp: true,
+      help
     }
   );
-  supparser.addArgument(
+  return subparser
+}
+
+function add_command_generate(subparsers) {
+  const subparser = new_subparser(
+    subparsers,
+    'generate',
+    "Generate an empty yaml, json, or toml config file"
+  );
+  subparser.addArgument(
     'generate',
     {
       help: 'Name for the generated file',
@@ -39,14 +55,12 @@ function args_to_settings_generate(args) {
 }
 
 function add_command_verify(subparsers) {
-  const supparser = subparsers.addParser(
+  const subparser = new_subparser(
+    subparsers,
     'verify',
-    {
-      addHelp:true,
-      help: "Verify the correctness of a L3aP configuration file"
-    }
+    "Verify the correctness of a L3aP configuration file"
   );
-  supparser.addArgument(
+  subparser.addArgument(
     'verify',
     {
       help: 'Config filename',
@@ -57,39 +71,35 @@ function add_command_verify(subparsers) {
 }
 
 function args_to_settings_verify(args) {
-  if (args.verify == '' || (typeof args.verify !== 'string')) {
-    args.verify = null;
-  }
+  args.verify = filter_non_string(args.verify);
 }
 
 function add_command_encode(subparsers) {
-  const supparser = subparsers.addParser(
+  const subparser = new_subparser(
+    subparsers,
     'encode',
-    {
-      addHelp:true,
-      help: "Encode a packet using a L3aP configuration file"
-    }
+    "Encode a packet using a L3aP configuration file"
   );
-  supparser.addArgument(
+  subparser.addArgument(
     'encode',
     {
       help: 'Config filename',
       metavar: 'filename'
     }
   );
-  supparser.addArgument(
+  subparser.addArgument(
     'category',
     {
       help: 'Packet category, e.g. set, get, pub...',
     }
   );
-  supparser.addArgument(
+  subparser.addArgument(
     'address',
     {
       help: 'Path of the data item to be addresses',
     }
   );
-  supparser.addArgument(
+  subparser.addArgument(
     '--payload',
     {
       help: 'Value(s) of payload items to be added',
@@ -99,27 +109,23 @@ function add_command_encode(subparsers) {
 }
 
 function args_to_settings_encode(args) {
-  if (args.encode == '' || (typeof args.encode !== 'string')) {
-    args.encode = null;
-  }
+  args.encode = filter_non_string(args.encode);
 }
 
 function add_command_decode(subparsers) {
-  const supparser = subparsers.addParser(
+  const subparser = new_subparser(
+    subparsers,
     'decode',
-    {
-      addHelp:true,
-      help: "Decode a packet using a L3aP configuration file"
-    }
+    "Decode a packet using a L3aP configuration file"
   );
-  supparser.addArgument(
+  subparser.addArgument(
     'decode',
     {
       help: 'Config filename',
       metavar: 'filename'
     }
   );
-  supparser.addArgument(
+  subparser.addArgument(
     'packet',
     {
       help: 'String to decode',
@@ -128,9 +134,7 @@ function add_command_decode(subparsers) {
 }
 
 function args_to_settings_decode(args) {
-  if (args.decode == '' || (typeof args.decode !== 'string')) {
-    args.decode = null;
-  }
+  args.decode = filter_non_string(args.decode);
 }
 
 function configure_parser() {
