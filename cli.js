@@ -5,26 +5,31 @@
 //
 // User facing command line interface
 //
-
 const fs = require('fs');
 const cli_parse = require("./src/cliParse");
 const verify = require("./src/verify");
 const codec = require("./src/codec");
 const packet = require("./src/packet");
 const leap = require("./index");
-
+const directory = require('path').dirname(__filename)
 
 // Generate the specified filetype
 function handle_generate(filename) {
   let data = null;
   if (/.json$/.exec(filename) !== null) {
-    data = fs.readFileSync('./src/config/generate.json');
+    data = fs.readFileSync(
+      directory + '/src/config/generate.json'
+    );
   }
   else if (/.toml$/.exec(filename) !== null) {
-    data = fs.readFileSync('./src/config/generate.toml');
+    data = fs.readFileSync(
+      directory + '/src/config/generate.toml'
+    );
   }
   else if (/.yaml$/.exec(filename) !== null) {
-    data = fs.readFileSync('./src/config/generate.yaml');
+    data = fs.readFileSync(
+      directory + '/src/config/generate.yaml'
+    );
   }
 
   if (data == null) {
