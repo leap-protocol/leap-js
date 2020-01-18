@@ -1,11 +1,10 @@
-![](https://github.com/leap-protocol/leap-js/workflows/L3aP-JS%20Testing/badge.svg)
+[![](https://github.com/leap-protocol/leap-js/workflows/L3aP-JS%20Testing/badge.svg)](https://github.com/leap-protocol/leap-js/)
 <a href="https://codeclimate.com/github/leap-protocol/leap-js/maintainability"><img src="https://api.codeclimate.com/v1/badges/5af40fb63b711342f273/maintainability" /></a>
+
+* [Specification documentation](https://leap-protocol.github.io/)
 
 # L3aP for Javascript
 Legible encoding for addressable packets for javascript
-
-Specification documentation:
-https://leap-protocol.github.io/
 
 # Installation
 
