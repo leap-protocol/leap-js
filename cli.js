@@ -7,7 +7,8 @@
 // User facing command line interface
 //
 
-const fs = require('fs');
+const loadConfig = require('./src/loadConfig');
+const fs = require('react-native-fs');
 const cli_parse = require("./src/cliParse");
 const leap = require("./index");
 const directory = require('path').dirname(__filename)
@@ -52,43 +53,63 @@ function handle_generate(filename) {
   }
 }
 
+function load_config(filename) {
+  const loader = new loadConfig.LoadConfig(filename);
+  if (loader.valid()) {
+    return loader.config();
+  }
+  else {
+    console.log(`Could not load ${filename}, please check it exists `+
+      `and is a valid YAML/JSON/TOML file.`);
+    return null;
+  }
+}
 
 // Verify the specified file
 function handle_verify(filename) {
-  leap.verify(filename);
+  const config = load_config();
+  if (config != null) {
+    leap.verify(config);
+  }
 }
 
 // Verify encode a packet
 function handle_encode(filename, category, address, payload) {
-  const c = new leap.Codec(filename);
-  if (c.valid() == false) {
-    leap.verify(filename);
-  }
-  else {
-    const p = new leap.Packet(category, address, payload);
-    const encoded = c.encode(p);
-    console.log(``+
-      `Encoded Packet ( ${category}, ${address}, [${payload.toString()}]):\n`+
-      `${encoded}`
-    );
+  const config = load_config();
+  if (config != null) {
+    const c = new leap.Codec(config);
+    if (c.valid() == false) {
+      leap.verify(config);
+    }
+    else {
+      const p = new leap.Packet(category, address, payload);
+      const encoded = c.encode(p);
+      console.log(``+
+        `Encoded Packet ( ${category}, ${address}, [${payload.toString()}]):\n`+
+        `${encoded}`
+      );
+    }
   }
 }
 
 // Verify encode a packet
 function handle_decode(filename, encoded) {
-  const c = new leap.Codec(filename);
-  const [_, [p]] = c.decode(encoded + c._config["end"]);
-  const u = c.unpack(p);
+  const config = load_config();
+  if (config != null) {
+    const c = new leap.Codec(config);
+    const [_, [p]] = c.decode(encoded + c._config["end"]);
+    const u = c.unpack(p);
 
-  console.log(
-    `Decoded Packet <${encoded}>:\n`+
-    `   category - ${p.category}`
-  );
-  Object.keys(u).forEach(function(key) {
     console.log(
-      `   address "${key}" = ${u[key]}`
+      `Decoded Packet <${encoded}>:\n`+
+      `   category - ${p.category}`
     );
-  });
+    Object.keys(u).forEach(function(key) {
+      console.log(
+        `   address "${key}" = ${u[key]}`
+      );
+    });
+  }
 }
 
 

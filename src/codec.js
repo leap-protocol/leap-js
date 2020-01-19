@@ -10,19 +10,21 @@ const utf8 = require('utf8');
 const packet = require('./packet');
 const typeCodec = require('./typeCodec');
 const mapGenerator = require('./mapGenerator');
-const loadConfig = require('./loadConfig');
+const verify = require('./verify');
 
 
 exports.Codec = class Codec {
-  constructor(filepath) {
+  constructor(input) {
     this.is_valid = false;
     this.encode_map = {};
     this.decode_map = {};
     this.start_to_category_map = {};
+    this._config = {};
 
-    const loader = new loadConfig.LoadConfig(filepath);
-    this.is_valid = loader.valid();
-    this._config = loader.config();
+    if (verify.verify_quiet(input)) {
+      this._config = input;
+      this.is_valid = true;        
+    }
 
     if (this.is_valid) {
       [this.encode_map, this.decode_map] = mapGenerator.generate_maps(
