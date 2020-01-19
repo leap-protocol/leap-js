@@ -1,10 +1,16 @@
 const assert = require('assert');
 const codec = require('../src/codec.js');
 const itemData = require('../src/itemData.js');
+const loadConfig = require('../src/loadConfig.js');
+
+function load_config(filename) {
+  const loader = new loadConfig.LoadConfig(filename);
+  return loader.config();
+}
 
 describe('Generate Encode Map', function() {
   beforeEach(function() {
-    c = new codec.Codec("test/fake/protocol-small.json");
+    c = new codec.Codec(load_config("test/fake/protocol-small.json"));
     this.map = c.encode_map;
   });
   it('map length', function() {
@@ -128,7 +134,7 @@ describe('Generate Encode Map', function() {
 
 describe('Generate Decode Map', function() {
   beforeEach(function() {
-    c = new codec.Codec("test/fake/protocol-small.json");
+    c = new codec.Codec(load_config("test/fake/protocol-small.json"));
     this.map = c.decode_map;
   });
   it('map length', function() {

@@ -1,6 +1,4 @@
 const assert = require('assert');
-const toml = require('toml');
-const fs= require('fs');
 const packet = require('../src/packet.js');
 const codec = require('./fake/fakeCodec.js');
 

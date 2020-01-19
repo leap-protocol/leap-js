@@ -6,8 +6,8 @@
 // Provides high level functions for verifying a L3aP config file
 //
 
-const yaml = require('js-yaml');
-const toml = require('toml');
+
+const configVerifier = require('./configVerifier.js');
 
 exports.verify = function verify(input){
   return do_verify(input, true);
