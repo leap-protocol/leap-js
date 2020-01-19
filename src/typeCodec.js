@@ -14,60 +14,60 @@ exports.encode_types = function encode_types(item, type) {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, 0x00n, 0xffn);
+      value = clamp(item, BigInt(0x00), BigInt(0xff));
       return to_padded_hex_string(value, 2);
     }
     else if (type == "u16") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, 0x0000n, 0xffffn);
+      value = clamp(item, BigInt(0x0000), BigInt(0xffff));
       return to_padded_hex_string(value, 4);
     }
     else if (type == "u32") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, 0x00000000n, 0xffffffffn);
+      value = clamp(item, BigInt(0x00000000), BigInt(0xffffffff));
       return to_padded_hex_string(value, 8);
     }
     else if (type == "u64") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, 0x0000000000000000n, 0xffffffffffffffffn);
+      value = clamp(item, BigInt("0x0000000000000000"), BigInt("0xffffffffffffffff"));
       return to_padded_hex_string(value, 16);
     }
     else if (type == "i8") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, -0x80n, 0x7Fn);
-      value = (value < 0n) ? (value + 0x100n): (value);
+      value = clamp(item, BigInt(-0x80), BigInt(0x7F));
+      value = (value < BigInt(0)) ? (value + BigInt(0x100)): (value);
       return to_padded_hex_string(value, 2);
     }
     else if (type == "i16") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, -0x8000n, 0x7FFFn);
-      value = (value < 0n) ? (value + 0x10000n): (value);
+      value = clamp(item, BigInt(-0x8000), BigInt(0x7FFF));
+      value = (value < BigInt(0)) ? (value + BigInt(0x10000)): (value);
       return to_padded_hex_string(value, 4);
     }
     else if (type == "i32") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, -0x80000000n, 0x7FFFFFFFn);
-      value = (value < 0n) ? (value + 0x100000000n): (value);
+      value = clamp(item, BigInt(-0x80000000), BigInt(0x7FFFFFFF));
+      value = (value < BigInt(0)) ? (value + BigInt(0x100000000)): (value);
       return to_padded_hex_string(value, 8);
     }
     else if (type == "i64") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
       }
-      value = clamp(item, -0x8000000000000000n, 0x7FFFFFFFFFFFFFFFn);
-      value = (value < 0n) ? (value + 0x10000000000000000n): (value);
+      value = clamp(item, -BigInt("0x8000000000000000"), BigInt("0x7FFFFFFFFFFFFFFF"));
+      value = (value < BigInt(0)) ? (value + BigInt("0x10000000000000000")): (value);
       return to_padded_hex_string(value, 16);
     }
     else if (type == "string") {
@@ -120,10 +120,10 @@ exports.encode_types = function encode_types(item, type) {
 
 function decode_unsigned(item, bits) {
   try {
-    return clamp(BigInt("0x" + item), 0n, (0x1n << bits) - 1n);
+    return clamp(BigInt("0x" + item), BigInt(0), (BigInt(0x1) << bits) - BigInt(1));
   }
   catch (e){
-    const default_value = 0n;
+    const default_value = BigInt(0);
     return default_value;
   }
 }
@@ -131,15 +131,15 @@ function decode_unsigned(item, bits) {
 function decode_signed(item, bits) {
   try {
     let value = BigInt("0x" + item);
-    let min_value = 0x1n << (bits - 1n)
+    let min_value = BigInt(0x1) << (bits - BigInt(1))
     if (value > min_value) {
-      value -= 0x1n << (bits);
+      value -= BigInt(0x1) << (bits);
     }
 
-    return clamp(value, -min_value, min_value - 1n)
+    return clamp(value, -min_value, min_value - BigInt(1))
   }
   catch {
-    const default_value = 0n;
+    const default_value = BigInt(0);
     return (default_value);
   }
 }
@@ -148,28 +148,28 @@ exports.decode_types = function decode_types(item, type) {
   try {
     let value;
     if (type == "u8") {
-      return decode_unsigned(item, 8n);
+      return decode_unsigned(item, BigInt(8));
     }
     else if (type == "u16") {
-      return decode_unsigned(item, 16n);
+      return decode_unsigned(item, BigInt(16));
     }
     else if (type == "u32") {
-      return decode_unsigned(item, 32n);
+      return decode_unsigned(item, BigInt(32));
     }
     else if (type == "u64") {
-      return decode_unsigned(item, 64n);
+      return decode_unsigned(item, BigInt(64));
     }
     else if (type == "i8") {
-      return decode_signed(item, 8n);
+      return decode_signed(item, BigInt(8));
     }
     else if (type == "i16") {
-      return decode_signed(item, 16n);
+      return decode_signed(item, BigInt(16));
     }
     else if (type == "i32") {
-      return decode_signed(item, 32n);
+      return decode_signed(item, BigInt(32));
     }
     else if (type == "i64") {
-      return decode_signed(item, 64n);
+      return decode_signed(item, BigInt(64));
     }
     else if (type == "string") {
       value = "";
@@ -196,7 +196,7 @@ exports.decode_types = function decode_types(item, type) {
       return value;
     }
     else if (typeof type == "object") {
-      value = decode_unsigned(item, 8n);
+      value = decode_unsigned(item, BigInt(8));
       if (value < type.length) {
         return type[value];
       }
