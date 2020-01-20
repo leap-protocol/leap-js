@@ -195,7 +195,7 @@ function test_valid_config(self) {
 
 A command line tool is avaliable for L3aP:
 
-`npm install leap-cli `
+`npm install leap-cli -g`
 
 **Generate a default config file:**
 
