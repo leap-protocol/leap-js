@@ -40,10 +40,7 @@ function verify_check_config(config, print) {
       console.log(`Verification of configuration passed`);
     }
     else {
-      console.log(`Verification of configuration failed`);
-      console.log(config);
       v.print_failure();
-      console.log(config);
     }
   }
 
