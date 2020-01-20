@@ -1,11 +1,10 @@
 const assert = require('assert');
 const codec = require('../src/codec.js');
 const itemData = require('../src/itemData.js');
-const loadConfig = require('../src/loadConfig.js');
+const fs = require('fs');
 
 function load_config(filename) {
-  const loader = new loadConfig.LoadConfig(filename);
-  return loader.config();
+  return JSON.parse(fs.readFileSync(filename));
 }
 
 describe('Generate Encode Map', function() {
@@ -24,15 +23,15 @@ describe('Generate Encode Map', function() {
     }
   });
   it('keys', function() {
-    const expected = [ 
-      "protocol", 
-      "protocol/version", 
-      "protocol/version/major", 
-      "protocol/version/minor", 
+    const expected = [
+      "protocol",
+      "protocol/version",
+      "protocol/version/major",
+      "protocol/version/minor",
       "protocol/version/patch",
-      "protocol/name", 
-      "protocol/app", 
-      "ping" 
+      "protocol/name",
+      "protocol/app",
+      "ping"
     ];
     const result = this.map;
     for (i in expected) {
@@ -40,25 +39,25 @@ describe('Generate Encode Map', function() {
     }
   });
   it('address data', function() {
-    const keys = [ 
-      "protocol", 
-      "protocol/version", 
-      "protocol/version/major", 
-      "protocol/version/minor", 
+    const keys = [
+      "protocol",
+      "protocol/version",
+      "protocol/version/major",
+      "protocol/version/minor",
       "protocol/version/patch",
-      "protocol/name", 
-      "protocol/app", 
-      "ping" 
+      "protocol/name",
+      "protocol/app",
+      "ping"
     ];
-    const expected = [ 
-      "1000", 
-      "1001", 
-      "1002", 
-      "1003", 
-      "1004", 
-      "1005", 
-      "1a00", 
-      "2000" 
+    const expected = [
+      "1000",
+      "1001",
+      "1002",
+      "1003",
+      "1004",
+      "1005",
+      "1a00",
+      "2000"
     ];
     const result = [];
     for (i in keys) {
@@ -67,28 +66,28 @@ describe('Generate Encode Map', function() {
     assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
   it('branch end data', function() {
-    const keys = [ 
-      "protocol", 
-      "protocol/version", 
-      "protocol/version/major", 
-      "protocol/version/minor", 
+    const keys = [
+      "protocol",
+      "protocol/version",
+      "protocol/version/major",
+      "protocol/version/minor",
       "protocol/version/patch",
-      "protocol/name", 
-      "protocol/app", 
-      "ping" 
+      "protocol/name",
+      "protocol/app",
+      "ping"
     ];
     const expected = [
-      [ 
-        "protocol/version/major", 
-        "protocol/version/minor", 
-        "protocol/version/patch", 
-        "protocol/name", 
-        "protocol/app" 
+      [
+        "protocol/version/major",
+        "protocol/version/minor",
+        "protocol/version/patch",
+        "protocol/name",
+        "protocol/app"
       ],
-      [ 
-        "protocol/version/major", 
-        "protocol/version/minor", 
-        "protocol/version/patch" 
+      [
+        "protocol/version/major",
+        "protocol/version/minor",
+        "protocol/version/patch"
       ],
       [ "protocol/version/major" ],
       [ "protocol/version/minor" ],
@@ -104,15 +103,15 @@ describe('Generate Encode Map', function() {
     assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
   it('types data', function() {
-    const keys = [ 
-      "protocol", 
-      "protocol/version", 
-      "protocol/version/major", 
-      "protocol/version/minor", 
+    const keys = [
+      "protocol",
+      "protocol/version",
+      "protocol/version/major",
+      "protocol/version/minor",
       "protocol/version/patch",
-      "protocol/name", 
-      "protocol/app", 
-      "ping" 
+      "protocol/name",
+      "protocol/app",
+      "ping"
     ];
     const expected = [
       [ "u8", "u8", "u16", "string", "string" ],
@@ -148,15 +147,15 @@ describe('Generate Decode Map', function() {
     }
   });
   it('keys', function() {
-    expected = [ 
-      "1000", 
-      "1001", 
-      "1002", 
-      "1003", 
-      "1004", 
-      "1005", 
-      "1a00", 
-      "2000" 
+    expected = [
+      "1000",
+      "1001",
+      "1002",
+      "1003",
+      "1004",
+      "1005",
+      "1a00",
+      "2000"
     ];
     const result = this.map;
     for (i in expected) {
@@ -164,25 +163,25 @@ describe('Generate Decode Map', function() {
     }
   });
   it('path data', function() {
-    const keys = [ 
-      "1000", 
-      "1001", 
-      "1002", 
-      "1003", 
-      "1004", 
-      "1005", 
-      "1a00", 
-      "2000" 
+    const keys = [
+      "1000",
+      "1001",
+      "1002",
+      "1003",
+      "1004",
+      "1005",
+      "1a00",
+      "2000"
     ];
-    const expected = [ 
-      "protocol", 
-      "protocol/version", 
-      "protocol/version/major", 
-      "protocol/version/minor", 
+    const expected = [
+      "protocol",
+      "protocol/version",
+      "protocol/version/major",
+      "protocol/version/minor",
       "protocol/version/patch",
-      "protocol/name", 
-      "protocol/app", 
-      "ping" 
+      "protocol/name",
+      "protocol/app",
+      "ping"
     ]
     const result = [];
     for (i in keys) {
@@ -191,28 +190,28 @@ describe('Generate Decode Map', function() {
     assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
   it('branch end data', function() {
-    const keys = [ 
-      "1000", 
-      "1001", 
-      "1002", 
-      "1003", 
-      "1004", 
-      "1005", 
-      "1a00", 
-      "2000" 
+    const keys = [
+      "1000",
+      "1001",
+      "1002",
+      "1003",
+      "1004",
+      "1005",
+      "1a00",
+      "2000"
     ];
     const expected = [
-      [ 
-        "protocol/version/major", 
-        "protocol/version/minor", 
-        "protocol/version/patch", 
-        "protocol/name", 
-        "protocol/app" 
+      [
+        "protocol/version/major",
+        "protocol/version/minor",
+        "protocol/version/patch",
+        "protocol/name",
+        "protocol/app"
       ],
-      [ 
-        "protocol/version/major", 
-        "protocol/version/minor", 
-        "protocol/version/patch" 
+      [
+        "protocol/version/major",
+        "protocol/version/minor",
+        "protocol/version/patch"
       ],
       [ "protocol/version/major" ],
       [ "protocol/version/minor" ],
@@ -228,15 +227,15 @@ describe('Generate Decode Map', function() {
     assert.equal(JSON.stringify(result), JSON.stringify(expected));
   });
   it('types data', function() {
-    const keys = [ 
-      "1000", 
-      "1001", 
-      "1002", 
-      "1003", 
-      "1004", 
-      "1005", 
-      "1a00", 
-      "2000" 
+    const keys = [
+      "1000",
+      "1001",
+      "1002",
+      "1003",
+      "1004",
+      "1005",
+      "1a00",
+      "2000"
     ];
     const expected = [
       [ "u8", "u8", "u16", "string", "string" ],

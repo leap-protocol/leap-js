@@ -2,11 +2,10 @@ const utf8 = require('utf8');
 const assert = require('assert');
 const codec = require('../src/codec.js');
 const packet = require('../src/packet.js');
-const loadConfig = require('../src/loadConfig.js');
+const fs = require('fs');
 
 function load_config(filename) {
-  const loader = new loadConfig.LoadConfig(filename);
-  return loader.config();
+  return JSON.parse(fs.readFileSync(filename));
 }
 
 describe('GetPacketDecode', function() {

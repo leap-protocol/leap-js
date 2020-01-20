@@ -1,14 +1,9 @@
 const assert = require('assert');
-const toml = require('toml');
 const fs= require('fs');
 const configVerifier = require('../src/configVerifier');
 
 function open_json(filepath) {
   return JSON.parse(fs.readFileSync(filepath));
-}
-
-function open_toml(filepath) {
-  return toml.parse(fs.readFileSync(filepath));
 }
 
 describe('VerifyBasic', function() {
@@ -25,14 +20,6 @@ describe('VerifyBasic', function() {
   });
   it('valid small json', function() {
     const config = open_json(this.valid_small_json);
-    assert.equal(this.verifier.verify(config), true);
-  });
-  it('valid toml', function() {
-    const config = open_toml(this.valid_toml);
-    assert.equal(this.verifier.verify(config), true);
-  });
-  it('valid small toml', function() {
-    const config = open_toml(this.valid_small_toml);
     assert.equal(this.verifier.verify(config), true);
   });
   it('invalid empty', function() {
