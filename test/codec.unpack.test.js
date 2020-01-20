@@ -1,10 +1,15 @@
 const assert = require('assert');
 const codec = require('../src/codec.js');
 const packet = require('../src/packet.js');
+const fs = require('fs');
+
+function load_config(filename) {
+  return JSON.parse(fs.readFileSync(filename));
+}
 
 describe('PacketPayloadUnpack', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('test_unpack_simple', function() {
     expected = {"protocol/version/major": 5};

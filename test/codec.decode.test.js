@@ -2,11 +2,15 @@ const utf8 = require('utf8');
 const assert = require('assert');
 const codec = require('../src/codec.js');
 const packet = require('../src/packet.js');
+const fs = require('fs');
 
+function load_config(filename) {
+  return JSON.parse(fs.readFileSync(filename));
+}
 
 describe('GetPacketDecode', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('simple_decoding', function() {
     expected = new packet.Packet("get", "protocol");
@@ -68,7 +72,7 @@ describe('GetPacketDecode', function() {
 
 describe('DecodeCompoundPackets', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('compound_decoding', function() {
     expected = new packet.Packet("get", "protocol");
@@ -106,7 +110,7 @@ describe('DecodeCompoundPackets', function() {
 
 describe('SetPayloadDecodeMultiple', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('sequential', function() {
     expected = new packet.Packet("set", "protocol/version", [0x12, 0x34, 0x567]);
@@ -141,7 +145,7 @@ describe('SetPayloadDecodeMultiple', function() {
 
 describe('SetPayloadDecodeSingle', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('simple_string', function() {
     expected = new packet.Packet("set", "typecheck/string", ["Hoani's String"]);

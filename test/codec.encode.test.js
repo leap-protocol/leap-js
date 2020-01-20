@@ -2,11 +2,15 @@ const utf8 = require('utf8');
 const assert = require('assert');
 const codec = require('../src/codec.js');
 const packet = require('../src/packet.js');
+const fs = require('fs');
 
+function load_config(filename) {
+  return JSON.parse(fs.readFileSync(filename));
+}
 
 describe('AckPacketEncode', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('ack_encoding', function() {
     expected = utf8.encode("A8000\n");
@@ -31,7 +35,7 @@ describe('AckPacketEncode', function() {
 
 describe('GetPacketEncode', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('simple_encoding', function() {
     expected = utf8.encode("G0000\n");
@@ -82,7 +86,7 @@ describe('GetPacketEncode', function() {
 
 describe('PacketCompoundEncode', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('compound_encoding', function() {
     expected = utf8.encode("G0000|8000\n");
@@ -106,7 +110,7 @@ describe('PacketCompoundEncode', function() {
 
 describe('SetPacketEncodeMultiple', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('sequential', function() {
     expected = utf8.encode("S0001:12:34:0567\n");
@@ -136,7 +140,7 @@ describe('SetPacketEncodeMultiple', function() {
 
 describe('SetPacketEncodeSingle', function() {
   beforeEach(function() {
-    this.codec = new codec.Codec("test/fake/protocol.json");
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
   });
   it('simple_string', function() {
     expected = utf8.encode("S2001:486f616e69277320537472696e67\n");

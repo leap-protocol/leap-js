@@ -14,9 +14,11 @@ Legible encoding for addressable packets for javascript
 
 Encoding a packet:
 ``` javascript
+const fs = require(fs);
 const leap = require('leap-protocol');
 
-const codec = new leap.Codec("leap-config.json");
+const config = JSON.parse(fs.readFileSync('leap-config.json'));
+const codec = new leap.Codec(config);
 const packet = new leap.Packet("set", "led/red", true);
 const encoded = codec.encode(packet);
 
@@ -25,9 +27,11 @@ const encoded = codec.encode(packet);
 
 Decoding a packet:
 ``` javascript
+const fs = require(fs);
 const leap = require('leap-protocol');
 
-const codec = leap.Codec("leap-config.json")
+const config = JSON.parse(fs.readFileSync('leap-config.json'));
+const codec = new leap.Codec(config);
 
 ...
 // Note: if there is a remainder it will be stored back in bytes
@@ -46,15 +50,16 @@ Object.keys(data).forEach(function (address) {
 
 ## Codec Class
 
-### codec = Codec(config_file_path)
-* **config_file_path** a string to point to the L3aP config file.
+### codec = Codec(config)
+* **config** L3aP configuration object.
 * **codec** L3aP codec object
 
 Instantiates a L3aP codec object for encoding packets to strings and decoding strings to packets.
 
 Example:
 ``` javascript
-const codec = new leap.Codec("leap-config.json");
+const config = yaml.parse(fs.readFileSync("leap-protocol.yaml"));
+const codec = new leap.Codec(config);
 ```
 
 ### is_valid = valid()
@@ -64,7 +69,8 @@ Determines whether the codec has a valid configuration. If the config is not val
 
 Example:
 ``` javascript
-const codec = new leap.Codec("leap-config.json");
+...
+const codec = new leap.Codec(config);
 if (codec.valid()) {
   ...
 }
@@ -170,52 +176,57 @@ See the `codec.unpack(packet)` method above.
 ## Verification
 
 ### result = verify(config_file)
-* **config_file** a valid L3aP config file
-* **result** false if config_file is invalid, true otherwise
+* **config_file** a L3aP config object
+* **result** false if config is invalid, true otherwise
 
-Checks the contents of a config_file for errors. Prints details of the first failure to stdout. Useful for regression testing.
+Checks the contents of a config object for errors. Prints details of the first failure to stdout. Useful for regression testing.
 
 Example:
 ```javascript
 ...
 function test_valid_config(self) {
-  assert(leap.verify("leap-config.json"));
+  const config = yaml.parse(fs.readFileSync("../leap-protocol.yaml"));
+  assert(leap.verify(config);
 }
 ...
 ```
 
 # Command Line
 
+A command line tool is avaliable for L3aP:
+
+`npm install leap-cli -g`
+
 **Generate a default config file:**
 
-`node node_modules/.bin/leap generate filename`
+`leap generate filename`
 
 File names can have extension .yaml .json or .toml.
 
 **Verify the contents of your config file:**
 
-`node node_modules/.bin/leap verify configfile`
+`leap verify configfile`
 
 Files can have extension .yaml .json or .toml.
 
 **Encode a packet based on a config file:**
 
-`node node_modules/.bin/leap encode configfile category address --payload payload`
+`leap encode configfile category address --payload payload`
 
 Example:
 ```sh
-hoani@Hoani-CPU sandbox % node cli.js encode config.yaml set item-1/child-1 1 --payload 10 1024.125
+hoani@Hoani-CPU sandbox % leap encode config.yaml set item-1/child-1 1 --payload 10 1024.125
 Encoded Packet ( set, item-1/child-1, [10,1024.125]):
 S0001:0a:44800400
 ```
 
 **Decode a packet based on a config file:**
 
-`node node_modules/.bin/leap decode configfile packet`
+`leap decode configfile packet`
 
 Example:
 ```sh
-hoani@Hoani-CPU sandbox % node cli.js decode config.yaml S0001:0a:44800400
+hoani@Hoani-CPU sandbox % leap decode config.yaml S0001:0a:44800400
 Decoded Packet <S0001:0a:44800400>:
    category - set
    address "item-1/child-1/grand-child-1" = 10
@@ -224,5 +235,5 @@ Decoded Packet <S0001:0a:44800400>:
 
 Help:
 
-`node node_modules/.bin/leap --help`
+`leap --help`
 
