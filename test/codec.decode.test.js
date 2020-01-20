@@ -8,6 +8,26 @@ function load_config(filename) {
   return JSON.parse(fs.readFileSync(filename));
 }
 
+describe('Invalid Decodes', function() {
+  beforeEach(function() {
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
+  });
+  it('Invalid category', function() {
+    [_, result] = this.codec.decode(utf8.encode("L0004\n"));
+    assert.equal(result.length, 0);
+  });
+  it('Invalid path', function() {
+    [_, result] = this.codec.decode(utf8.encode("SFFFF\n"));
+    assert.equal(result.length, 0);
+  });
+  // it('Invalid type', function() {
+  //   expected = utf8.encode("S2003:\n");
+  //   _packet = new packet.Packet("set", "typecheck/uint8", "invalid");
+  //   result = this.codec.encode(_packet);
+  //   assert.equal(result, expected);
+  // });
+});
+
 describe('GetPacketDecode', function() {
   beforeEach(function() {
     this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
@@ -22,35 +42,35 @@ describe('GetPacketDecode', function() {
     expected = utf8.encode("S10");
     [result, packets] = this.codec.decode(utf8.encode("G0000\nS10"));
     assert.equal(result, expected);
-    assert.equal(packets.length, 1)
+    assert.equal(packets.length, 1);
   });
   it('incomplete', function() {
     expected = utf8.encode("S10");
     [result, packets] = this.codec.decode(utf8.encode("S10"));
     assert.equal(result, expected);
-    assert.equal(packets.length, 0)
+    assert.equal(packets.length, 0);
   });
   it('nested_decoding', function() {
     expected = new packet.Packet("get", "protocol/version/patch");
     [_, [result]] = this.codec.decode(utf8.encode("G0004\n"));
     assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths))
+    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
   });
   it('deep_nest_decoding', function() {
     expected = new packet.Packet("get", "control/pid/setpoint/value");
     [_, [result]] = this.codec.decode(utf8.encode("G800e\n"));
     assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths))
+    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
   });
   it('ack_category', function() {
     expected = new packet.Packet("ack", "control");
     [_, [result]] = this.codec.decode(utf8.encode("A8000\n"));
-    assert.equal(result.category, expected.category)
+    assert.equal(result.category, expected.category);
   });
   it('nack_category', function() {
     expected = new packet.Packet("nak", "control");
     [_, [result]] = this.codec.decode(utf8.encode("N8000\n"));
-    assert.equal(result.category, expected.category)
+    assert.equal(result.category, expected.category);
   });
   it('simple_payload_decoding', function() {
     expected = new packet.Packet("get", "protocol/version/major", [0x11n]);

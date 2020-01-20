@@ -8,6 +8,30 @@ function load_config(filename) {
   return JSON.parse(fs.readFileSync(filename));
 }
 
+describe('Invalid Encodes', function() {
+  beforeEach(function() {
+    this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
+  });
+  it('Invalid category', function() {
+    expected = utf8.encode("");
+    _packet = new packet.Packet("back", "control");
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('Invalid path', function() {
+    expected = utf8.encode("");
+    _packet = new packet.Packet("set", "typecheck/invalid");
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+  it('Invalid type', function() {
+    expected = utf8.encode("S2003:\n");
+    _packet = new packet.Packet("set", "typecheck/uint8", "invalid");
+    result = this.codec.encode(_packet);
+    assert.equal(result, expected);
+  });
+});
+
 describe('AckPacketEncode', function() {
   beforeEach(function() {
     this.codec = new codec.Codec(load_config("test/fake/protocol.json"));
@@ -40,12 +64,6 @@ describe('GetPacketEncode', function() {
   it('simple_encoding', function() {
     expected = utf8.encode("G0000\n");
     _packet = new packet.Packet("get", "protocol");
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('invalid_address', function() {
-    expected = utf8.encode("");
-    _packet = new packet.Packet("get", "protocol/invalid");
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });

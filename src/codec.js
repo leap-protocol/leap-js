@@ -23,7 +23,7 @@ exports.Codec = class Codec {
 
     if (verify.verify_quiet(input)) {
       this._config = input;
-      this.is_valid = true;        
+      this.is_valid = true;
     }
 
     if (this.is_valid) {
@@ -61,7 +61,7 @@ exports.Codec = class Codec {
       }
       else {
         encoded += encoded_packet;
-      }  
+      }
     }
     encoded += this._config["end"];
     return utf8.encode(encoded);
@@ -69,7 +69,11 @@ exports.Codec = class Codec {
 
   _encode_packet(_packet) {
     let internal = "";
-    const start = this._config["category"][_packet.category]
+    const start = this._config["category"][_packet.category];
+
+    if ((_packet.category in this._config.category) === false) {
+      return null;
+    }
 
     for (let j in _packet.paths) {
       const path = _packet.paths[j];
@@ -137,9 +141,10 @@ exports.Codec = class Codec {
     strings = strings.slice(0, strings.length - 1);
 
     for(let i in strings) {
-      packets.push(
-        this._decode_packet(strings[i])
-      );
+      const p = this._decode_packet(strings[i]);
+      if (p != null) {
+        packets.push(p);
+      }
     }
     return [remainder, packets];
   }
@@ -148,20 +153,27 @@ exports.Codec = class Codec {
     string = utf8.decode(string);
     const start = string[0];
     const category = this._category_from_start(start);
-    const _packet = new packet.Packet(category);
-
-    string = string.slice(1, string.length);
-    const subpackets = string.split(this._config["compound"]);
-
-    for (let j in subpackets) {
-      const data = this._decode_subpacket(subpackets[j]);
-      if (data != null) {
-        const [path, payload] = data;
-        _packet.add(path, payload);
-      }
+    if (category == null) {
+      return null;
     }
+    else {
+      let _packet = new packet.Packet(category);
 
-    return _packet;
+      string = string.slice(1, string.length);
+      const subpackets = string.split(this._config["compound"]);
+
+      for (let j in subpackets) {
+        const data = this._decode_subpacket(subpackets[j]);
+        if (data != null) {
+          const [path, payload] = data;
+          _packet.add(path, payload);
+        }
+        else {
+          _packet = null;
+        }
+      }
+      return _packet;
+    }
   }
 
   _decode_subpacket(subpacket) {
@@ -170,16 +182,18 @@ exports.Codec = class Codec {
     if (parts != ['']) {
       const payload = [];
       const addr = parts[0];
-      const decode_data = this.decode_map[addr];
-      const encoded_payload = parts.slice(1, parts.length);
+      if (addr in this.decode_map) {
+        const decode_data = this.decode_map[addr];
+        const encoded_payload = parts.slice(1, parts.length);
 
-      for (let k = 0; k < encoded_payload.length; k++) {
-        const item = encoded_payload[k];
-        const type = decode_data.types[k];
-        payload.push(typeCodec.decode_types(item, type));
+        for (let k = 0; k < encoded_payload.length; k++) {
+          const item = encoded_payload[k];
+          const type = decode_data.types[k];
+          payload.push(typeCodec.decode_types(item, type));
+        }
+
+        return [decode_data.path, payload]
       }
-
-      return [decode_data.path, payload]
     }
     return null;
   }
@@ -218,7 +232,10 @@ exports.Codec = class Codec {
   }
 
   _category_from_start(start) {
-    return this.start_to_category_map[start];
+    if (start in this.start_to_category_map) {
+      return this.start_to_category_map[start];
+    }
+    return null;
   }
 
 }
