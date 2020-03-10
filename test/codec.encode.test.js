@@ -180,7 +180,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('bigint u8', function() {
     expected = utf8.encode("S2003:ab\n");
-    _packet = new packet.Packet("set", "typecheck/uint8", [0xabn]);
+    _packet = new packet.Packet("set", "typecheck/uint8", [0xab]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -210,7 +210,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('bigint u16', function() {
     expected = utf8.encode("S2004:0237\n");
-    _packet = new packet.Packet("set", "typecheck/uint16", [0x0237n]);
+    _packet = new packet.Packet("set", "typecheck/uint16", [0x0237]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -234,7 +234,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('bigint u32', function() {
     expected = utf8.encode("S2005:00102239\n");
-    _packet = new packet.Packet("set", "typecheck/uint32", [0x102239n]);
+    _packet = new packet.Packet("set", "typecheck/uint32", [0x102239]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -250,30 +250,6 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('small u64', function() {
-    expected = utf8.encode("S2006:0000000000102234\n");
-    _packet = new packet.Packet("set", "typecheck/uint64", [0x102234]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('simple_u64', function() {
-    expected = utf8.encode("S2006:0010223400000078\n");
-    _packet = new packet.Packet("set", "typecheck/uint64", [0x10223400000078n]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('underflow_u64', function() {
-    expected = utf8.encode("S2006:0000000000000000\n");
-    _packet = new packet.Packet("set", "typecheck/uint64", [-0x10223400000078n]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('overflow_u64', function() {
-    expected = utf8.encode("S2006:ffffffffffffffff\n");
-    _packet = new packet.Packet("set", "typecheck/uint64", [0x10000010223400000078n]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
   it('simple_i8', function() {
     expected = utf8.encode("S2007:11\n");
     _packet = new packet.Packet("set", "typecheck/int8", [0x11]);
@@ -282,7 +258,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('bigint i8', function() {
     expected = utf8.encode("S2007:16\n");
-    _packet = new packet.Packet("set", "typecheck/int8", [0x16n]);
+    _packet = new packet.Packet("set", "typecheck/int8", [0x16]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -306,7 +282,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('bigint i16', function() {
     expected = utf8.encode("S2008:0434\n");
-    _packet = new packet.Packet("set", "typecheck/int16", [0x0434n]);
+    _packet = new packet.Packet("set", "typecheck/int16", [0x0434]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -336,7 +312,7 @@ describe('SetPacketEncodeSingle', function() {
   });
   it('bigint i32', function() {
     expected = utf8.encode("S2009:00152234\n");
-    _packet = new packet.Packet("set", "typecheck/int32", [0x152234n]);
+    _packet = new packet.Packet("set", "typecheck/int32", [0x152234]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
@@ -361,36 +337,6 @@ describe('SetPacketEncodeSingle', function() {
   it('underflow_i32', function() {
     expected = utf8.encode("S2009:80000000\n");
     _packet = new packet.Packet("set", "typecheck/int32", [-0x1FF0000000]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('small i64', function() {
-    expected = utf8.encode("S200a:0000000000102234\n");
-    _packet = new packet.Packet("set", "typecheck/int64", [0x102234]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('simple_i64', function() {
-    expected = utf8.encode("S200a:0010223400000078\n");
-    _packet = new packet.Packet("set", "typecheck/int64", [0x10223400000078n]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('signed_i64', function() {
-    expected = utf8.encode("S200a:ffefddcbffffff88\n");
-    _packet = new packet.Packet("set", "typecheck/int64", [-0x10223400000078n]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('overflow_i64', function() {
-    expected = utf8.encode("S200a:7fffffffffffffff\n");
-    _packet = new packet.Packet("set", "typecheck/int64", [0x1ffffffffffffffff0n]);
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
-  it('underflow_i64', function() {
-    expected = utf8.encode("S200a:8000000000000000\n");
-    _packet = new packet.Packet("set", "typecheck/int64", [-0x1FF000000000000000n]);
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });

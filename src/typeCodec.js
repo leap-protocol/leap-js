@@ -31,13 +31,6 @@ exports.encode_types = function encode_types(item, type) {
       value = clamp(item, BigInt(0x00000000), BigInt(0xffffffff));
       return to_padded_hex_string(value, 8);
     }
-    else if (type == "u64") {
-      if ((item instanceof BigInt) == false) {
-        item = BigInt(item);
-      }
-      value = clamp(item, BigInt("0x0000000000000000"), BigInt("0xffffffffffffffff"));
-      return to_padded_hex_string(value, 16);
-    }
     else if (type == "i8") {
       if ((item instanceof BigInt) == false) {
         item = BigInt(item);
@@ -61,14 +54,6 @@ exports.encode_types = function encode_types(item, type) {
       value = clamp(item, BigInt(-0x80000000), BigInt(0x7FFFFFFF));
       value = (value < BigInt(0)) ? (value + BigInt(0x100000000)): (value);
       return to_padded_hex_string(value, 8);
-    }
-    else if (type == "i64") {
-      if ((item instanceof BigInt) == false) {
-        item = BigInt(item);
-      }
-      value = clamp(item, -BigInt("0x8000000000000000"), BigInt("0x7FFFFFFFFFFFFFFF"));
-      value = (value < BigInt(0)) ? (value + BigInt("0x10000000000000000")): (value);
-      return to_padded_hex_string(value, 16);
     }
     else if (type == "string") {
       value = "";
@@ -167,9 +152,6 @@ exports.decode_types = function decode_types(item, type) {
     }
     else if (type == "i32") {
       return decode_signed(item, BigInt(32));
-    }
-    else if (type == "i64") {
-      return decode_signed(item, BigInt(64));
     }
     else if (type == "string") {
       value = "";
