@@ -20,12 +20,6 @@ describe('Invalid Decodes', function() {
     [_, result] = this.codec.decode(utf8.encode("SFFFF\n"));
     assert.equal(result.length, 0);
   });
-  it('Invalid type', function() {
-    expected = utf8.encode("S2003:\n");
-    _packet = new packet.Packet("set", "typecheck/uint8", "invalid");
-    result = this.codec.encode(_packet);
-    assert.equal(result, expected);
-  });
 });
 
 describe('GetPacketDecode', function() {
@@ -224,21 +218,21 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('simple_u32', function() {
-    expected = new packet.Packet("set", "typecheck/uint32", [0x102234]);
+    expected = new packet.Packet("set", "typecheck/uint32", [0x10_2234]);
     [_, [result]] = this.codec.decode(("S2005:00102234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_u32', function() {
-    expected = new packet.Packet("set", "typecheck/uint32", [0x00000000]);
+    expected = new packet.Packet("set", "typecheck/uint32", [0x0000_0000]);
     [_, [result]] = this.codec.decode(("S2005:-00102234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('overflow_u32', function() {
-    expected = new packet.Packet("set", "typecheck/uint32", [0xffffffff]);
+    expected = new packet.Packet("set", "typecheck/uint32", [0xffff_ffff]);
     [_, [result]] = this.codec.decode(("S2005:100002234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
@@ -260,7 +254,7 @@ describe('SetPayloadDecodeSingle', function() {
   });
   it('invalid_i8', function() {
     expected = new packet.Packet("set", "typecheck/int8", [0]);
-    [_, [result]] = this.codec.decode(("S2007:-ef\n"));
+    [_, [result]] = this.codec.decode(("S2007:lef\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
