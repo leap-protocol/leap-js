@@ -20,12 +20,6 @@ describe('Invalid Decodes', function() {
     [_, result] = this.codec.decode(utf8.encode("SFFFF\n"));
     assert.equal(result.length, 0);
   });
-  // it('Invalid type', function() {
-  //   expected = utf8.encode("S2003:\n");
-  //   _packet = new packet.Packet("set", "typecheck/uint8", "invalid");
-  //   result = this.codec.encode(_packet);
-  //   assert.equal(result, expected);
-  // });
 });
 
 describe('GetPacketDecode', function() {
@@ -73,7 +67,7 @@ describe('GetPacketDecode', function() {
     assert.equal(result.category, expected.category);
   });
   it('simple_payload_decoding', function() {
-    expected = new packet.Packet("get", "protocol/version/major", [0x11n]);
+    expected = new packet.Packet("get", "protocol/version/major", [0x11]);
     [_, [result]] = this.codec.decode(utf8.encode("G0002:11\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
@@ -103,7 +97,7 @@ describe('DecodeCompoundPackets', function() {
     assert.equal(JSON.stringify(result[0].paths), JSON.stringify(expected.paths));
   });
   it('compound_with_payloads_decoding', function() {
-    expected = new packet.Packet("set", "protocol", [0x11n, 0x22n, 0x33n]);
+    expected = new packet.Packet("set", "protocol", [0x11, 0x22, 0x33]);
     expected.add("protocol/version", 0x44);
     [_, result] = this.codec.decode(utf8.encode("S0000:11:22:33|0001:44\n"));
     assert.equal(result.length, 1);
@@ -182,169 +176,127 @@ describe('SetPayloadDecodeSingle', function() {
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('simple_u8', function() {
-    expected = new packet.Packet("set", "typecheck/uint8", [0xa5n]);
+    expected = new packet.Packet("set", "typecheck/uint8", [0xa5]);
     [_, [result]] = this.codec.decode(("S2003:a5\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_u8', function() {
-    expected = new packet.Packet("set", "typecheck/uint8", [0x00n]);
+    expected = new packet.Packet("set", "typecheck/uint8", [0x00]);
     [_, [result]] = this.codec.decode(("S2003:-e3\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('overflow_u8', function() {
-    expected = new packet.Packet("set", "typecheck/uint8", [0xffn]);
+    expected = new packet.Packet("set", "typecheck/uint8", [0xff]);
     [_, [result]] = this.codec.decode(("S2003:1a5\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('simple_u16', function() {
-    expected = new packet.Packet("set", "typecheck/uint16", [0x0234n]);
+    expected = new packet.Packet("set", "typecheck/uint16", [0x0234]);
     [_, [result]] = this.codec.decode(("S2004:0234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_u16', function() {
-    expected = new packet.Packet("set", "typecheck/uint16", [0x0000n]);
+    expected = new packet.Packet("set", "typecheck/uint16", [0x0000]);
     [_, [result]] = this.codec.decode(("S2004:-0234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('overflow_u16', function() {
-    expected = new packet.Packet("set", "typecheck/uint16", [0xffffn]);
+    expected = new packet.Packet("set", "typecheck/uint16", [0xffff]);
     [_, [result]] = this.codec.decode(("S2004:1ffff\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('simple_u32', function() {
-    expected = new packet.Packet("set", "typecheck/uint32", [0x102234n]);
+    expected = new packet.Packet("set", "typecheck/uint32", [0x102234]);
     [_, [result]] = this.codec.decode(("S2005:00102234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_u32', function() {
-    expected = new packet.Packet("set", "typecheck/uint32", [0x00000000n]);
+    expected = new packet.Packet("set", "typecheck/uint32", [0x00000000]);
     [_, [result]] = this.codec.decode(("S2005:-00102234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('overflow_u32', function() {
-    expected = new packet.Packet("set", "typecheck/uint32", [0xffffffffn]);
+    expected = new packet.Packet("set", "typecheck/uint32", [0xffffffff]);
     [_, [result]] = this.codec.decode(("S2005:100002234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
-  it('simple_u64', function() {
-    expected = new packet.Packet("set", "typecheck/uint64", [0x10223400000078n]);
-    [_, [result]] = this.codec.decode(("S2006:0010223400000078\n"));
-    assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
-    assert.equal((result.payloads).toString(), (expected.payloads).toString());
-  });
-  it('invalid_u64', function() {
-    expected = new packet.Packet("set", "typecheck/uint64", [0x0n]);
-    [_, [result]] = this.codec.decode(("S2006:-10223400000078\n"));
-    assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
-    assert.equal((result.payloads).toString(), (expected.payloads).toString());
-  });
-  it('overflow_u64', function() {
-    expected = new packet.Packet("set", "typecheck/uint64", [0xffffffffffffffffn]);
-    [_, [result]] = this.codec.decode(("S2006:10000010223400000078\n"));
-    assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
-    assert.equal((result.payloads).toString(), (expected.payloads).toString());
-  });
   it('simple_i8', function() {
-    expected = new packet.Packet("set", "typecheck/int8", [0x11n]);
+    expected = new packet.Packet("set", "typecheck/int8", [0x11]);
     [_, [result]] = this.codec.decode(("S2007:11\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('negative_i8', function() {
-    expected = new packet.Packet("set", "typecheck/int8", [-0x11n]);
+    expected = new packet.Packet("set", "typecheck/int8", [-0x11]);
     [_, [result]] = this.codec.decode(("S2007:ef\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_i8', function() {
-    expected = new packet.Packet("set", "typecheck/int8", [0n]);
-    [_, [result]] = this.codec.decode(("S2007:-ef\n"));
+    expected = new packet.Packet("set", "typecheck/int8", [0]);
+    [_, [result]] = this.codec.decode(("S2007:lef\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('simple_i16', function() {
-    expected = new packet.Packet("set", "typecheck/int16", [0x0234n]);
+    expected = new packet.Packet("set", "typecheck/int16", [0x0234]);
     [_, [result]] = this.codec.decode(("S2008:0234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('signed_i16', function() {
-    expected = new packet.Packet("set", "typecheck/int16", [-0x0234n]);
+    expected = new packet.Packet("set", "typecheck/int16", [-0x0234]);
     [_, [result]] = this.codec.decode(("S2008:fdcc\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_i16', function() {
-    expected = new packet.Packet("set", "typecheck/int16", [0n]);
+    expected = new packet.Packet("set", "typecheck/int16", [0]);
     [_, [result]] = this.codec.decode(("S2008:hundred\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('simple_i32', function() {
-    expected = new packet.Packet("set", "typecheck/int32", [0x102234n]);
+    expected = new packet.Packet("set", "typecheck/int32", [0x102234]);
     [_, [result]] = this.codec.decode(("S2009:00102234\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('signed_i32', function() {
-    expected = new packet.Packet("set", "typecheck/int32", [-0x102234n]);
+    expected = new packet.Packet("set", "typecheck/int32", [-0x102234]);
     [_, [result]] = this.codec.decode(("S2009:ffefddcc\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
   });
   it('invalid_i32', function() {
-    expected = new packet.Packet("set", "typecheck/int32", [0n]);
+    expected = new packet.Packet("set", "typecheck/int32", [0]);
     [_, [result]] = this.codec.decode(("S2009:abfgddcc\n"));
-    assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
-    assert.equal((result.payloads).toString(), (expected.payloads).toString());
-  });
-  it('simple_i64', function() {
-    expected = new packet.Packet("set", "typecheck/int64", [0x10223400000078n]);
-    [_, [result]] = this.codec.decode(("S200a:0010223400000078\n"));
-    assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
-    assert.equal((result.payloads).toString(), (expected.payloads).toString());
-  });
-  it('signed_i64', function() {
-    expected = new packet.Packet("set", "typecheck/int64", [-0x10223400000078n]);
-    [_, [result]] = this.codec.decode(("S200a:ffefddcbffffff88\n"));
-    assert.equal(result.category, expected.category);
-    assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
-    assert.equal((result.payloads).toString(), (expected.payloads).toString());
-  });
-  it('invalid i64', function() {
-    expected = new packet.Packet("set", "typecheck/int64", [0n]);
-    [_, [result]] = this.codec.decode(("S200a:ffefddcbf-ffff88\n"));
     assert.equal(result.category, expected.category);
     assert.equal(JSON.stringify(result.paths), JSON.stringify(expected.paths));
     assert.equal((result.payloads).toString(), (expected.payloads).toString());
