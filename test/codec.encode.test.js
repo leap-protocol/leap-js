@@ -178,7 +178,7 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('bigint u8', function() {
+  it('int u8', function() {
     expected = utf8.encode("S2003:ab\n");
     _packet = new packet.Packet("set", "typecheck/uint8", [0xab]);
     result = this.codec.encode(_packet);
@@ -208,7 +208,7 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('bigint u16', function() {
+  it('int u16', function() {
     expected = utf8.encode("S2004:0237\n");
     _packet = new packet.Packet("set", "typecheck/uint16", [0x0237]);
     result = this.codec.encode(_packet);
@@ -232,7 +232,7 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('bigint u32', function() {
+  it('int u32', function() {
     expected = utf8.encode("S2005:00102239\n");
     _packet = new packet.Packet("set", "typecheck/uint32", [0x102239]);
     result = this.codec.encode(_packet);
@@ -256,7 +256,7 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('bigint i8', function() {
+  it('int i8', function() {
     expected = utf8.encode("S2007:16\n");
     _packet = new packet.Packet("set", "typecheck/int8", [0x16]);
     result = this.codec.encode(_packet);
@@ -280,7 +280,7 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('bigint i16', function() {
+  it('int i16', function() {
     expected = utf8.encode("S2008:0434\n");
     _packet = new packet.Packet("set", "typecheck/int16", [0x0434]);
     result = this.codec.encode(_packet);
@@ -310,7 +310,7 @@ describe('SetPacketEncodeSingle', function() {
     result = this.codec.encode(_packet);
     assert.equal(result, expected);
   });
-  it('bigint i32', function() {
+  it('int i32', function() {
     expected = utf8.encode("S2009:00152234\n");
     _packet = new packet.Packet("set", "typecheck/int32", [0x152234]);
     result = this.codec.encode(_packet);
