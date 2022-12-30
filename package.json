@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/leap-protocol/leap-js#readme",
   "devDependencies": {
-    "mocha": "^6.2.2",
+    "mocha": "^10.2.0",
     "nyc": "^15.0.0"
   },
   "dependencies": {
